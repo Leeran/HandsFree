@@ -1,0 +1,7 @@
+INDEX VERSION 1.126+/Users/leeranraphaely/Documents/ResearchWorkspace/.metadata/.plugins/org.eclipse.jdt.core
+2772698000.index
+4190489459.index
+38330350.index
+25170364.index
+1772787275.index
+199591658.index
