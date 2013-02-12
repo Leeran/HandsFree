@@ -194,3 +194,20 @@ Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
 10:27:02 **** Incremental Build of configuration Debug for project OpenCVTests ****
 /Users/leeranraphaely/android-ndk-r8d/ndk-build all 
 Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+11:07:06 **** Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+11:07:26 **** Clean-only build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build clean 
+Clean: gnustl_shared [armeabi-v7a]
+Clean: gnustl_static [armeabi-v7a]
+Clean: opencv_tests [armeabi-v7a]
+11:09:27 **** Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Compile++ thumb  : opencv_tests <= motion_averager.cpp
+Prebuilt       : libgnustl_static.a <= <NDK>/sources/cxx-stl/gnu-libstdc++/4.6/libs/armeabi-v7a/
+SharedLibrary  : libopencv_tests.so
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+11:09:42 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so

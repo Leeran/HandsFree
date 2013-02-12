@@ -1,5 +1,5 @@
-/Users/leeranraphaely/Documents/ResearchWorkspace/OpenCVTests/obj/local/armeabi-v7a/objs/opencv_tests/motion_averager.o: \
- /Users/leeranraphaely/Documents/ResearchWorkspace/OpenCVTests/jni/motion_averager.cpp \
+/Users/leeranraphaely/HandsFree/OpenCVTests/obj/local/armeabi-v7a/objs/opencv_tests/motion_averager.o: \
+ /Users/leeranraphaely/HandsFree/OpenCVTests/jni/motion_averager.cpp \
  /Users/leeranraphaely/android-ndk-r8d/platforms/android-8/arch-arm/usr/include/jni.h \
  ../../sdk/native/jni/include/opencv2/core/core.hpp \
  ../../sdk/native/jni/include/opencv2/core/types_c.h \
