@@ -1,6 +1,6 @@
-11:09:42 **** Incremental Build of configuration Debug for project OpenCVTests ****
+12:31:58 **** Incremental Build of configuration Debug for project OpenCVTests ****
 /Users/leeranraphaely/android-ndk-r8d/ndk-build all 
 Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
 
-11:09:43 Build Finished (took 905ms)
+12:31:59 Build Finished (took 432ms)
 

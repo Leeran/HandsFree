@@ -24,11 +24,29 @@ public class MovementDetection extends Activity implements CvCameraViewListener 
 	protected static final String TAG = "MovementDetection";
 	private static final double EPSILON = 0.00001;
 	
+	enum Direction {
+		None, Left, Right, Up, Down
+	} ;
+	
+	private static final double MIN_FRACTION_SCREEN_MOTION   = 0.1;
+	
+	// unused for now
+	//private static final double MAX_NON_DIRECTIONAL_MOTION_X = 40.0;
+	//private static final double MAX_NON_DIRECTIONAL_MOTION_Y = 40.0;
+	
+	private static final double MIN_DIRECTIONAL_MOTION_X     = 300.0;
+	private static final double MIN_DIRECTIONAL_MOTION_Y     = 150.0;
+	
 	private CameraBridgeViewBase mOpenCvCameraView;
 	
 	private Mat mPreviousFrame;
 	private Mat mCurrentFrame;
 	private Mat mDifference;
+	
+	private Point mStartPos;
+	private Point mPreviousPos;
+	
+	int mLeft, mRight, mUp, mDown;
 	
 	private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
 	    @Override
@@ -69,6 +87,12 @@ public class MovementDetection extends Activity implements CvCameraViewListener 
 	     mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.java_surface_view);
 	     mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
 	     mOpenCvCameraView.setCvCameraViewListener(this);
+	     mOpenCvCameraView.enableFpsMeter();
+	     
+	     mLeft = mRight = mUp = mDown = 0;
+	     
+	     mPreviousPos = new Point(0, 0);
+	     mStartPos = null;
 	 }
 
 	 @Override
@@ -112,7 +136,42 @@ public class MovementDetection extends Activity implements CvCameraViewListener 
 		 
 		 MotionDetectionReturnValue mdret = DetectMovementPosition(mDifference.getNativeObjAddr());
 		 
-		 Core.putText(
+		 Direction movementDirection = Direction.None;
+		 
+		 if(mStartPos == null && mdret.fractionOfScreenInMotion > MIN_FRACTION_SCREEN_MOTION) {
+			 mStartPos = mdret.averagePosition;
+		 }
+		 
+		 else if(mStartPos != null && mdret.fractionOfScreenInMotion < MIN_FRACTION_SCREEN_MOTION) {
+			 // check if it's a vertical move or a horizontal move
+			 if(mPreviousPos.x - mStartPos.x > MIN_DIRECTIONAL_MOTION_X) {
+				 movementDirection = Direction.Right;
+			 }
+			 
+			 else if(mStartPos.x - mPreviousPos.x > MIN_DIRECTIONAL_MOTION_X) {
+				 movementDirection = Direction.Left;
+			 }
+			 
+			 double verticalMotion = Math.abs(mPreviousPos.y - mStartPos.y);
+			 if(verticalMotion > MIN_DIRECTIONAL_MOTION_Y) {
+				 if(movementDirection == Direction.None || verticalMotion > Math.abs(mPreviousPos.x - mStartPos.x) * 2) {
+					 if(mPreviousPos.y < mStartPos.y)
+						 movementDirection = Direction.Up;
+					 else
+						 movementDirection = Direction.Down;
+				 }
+			 }
+			 
+			 mStartPos = null;
+		 }
+		 
+		 // keep up to date stats
+		 updateStats(movementDirection);
+		 
+		 mPreviousPos.x = mdret.averagePosition.x;
+		 mPreviousPos.y = mdret.averagePosition.y;
+		 
+		 /*Core.putText(
 				 mDifference,
 				 "(" + mdret.averagePosition.x + ", " + mdret.averagePosition.y + ")",
 				 new Point(5.0, 30.0),
@@ -126,10 +185,37 @@ public class MovementDetection extends Activity implements CvCameraViewListener 
 				 new Point(5.0, 60.0),
 				 Core.FONT_HERSHEY_SIMPLEX,
 				 1.0,
+				 new Scalar(0, 0, 0));*/
+		 
+		 Core.putText(
+				 mDifference,
+				 "{" + mLeft + ", " + mRight + ", " + mUp + ", " + mDown + "}",
+				 new Point(5.0, 90.0),
+				 Core.FONT_HERSHEY_SIMPLEX,
+				 1.0,
 				 new Scalar(0, 0, 0));
 		 
 		 
 		 return mDifference;
+	 }
+	 
+	 private void updateStats(Direction dir) {
+		 switch(dir) {
+			case Down:
+				mDown++;
+				break;
+			case Left:
+				mLeft++;
+				break;
+			case Right:
+				mRight++;
+				break;
+			case Up:
+				mUp++;
+				break;
+			default:
+			break;
+		 }
 	 }
 
 	@Override
