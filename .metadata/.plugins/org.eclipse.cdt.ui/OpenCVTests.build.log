@@ -1,6 +1,8 @@
-02:41:53 **** Incremental Build of configuration Debug for project OpenCVTests ****
+10:19:34 **** Incremental Build of configuration Debug for project OpenCVTests ****
 /Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Compile++ thumb  : opencv_tests <= motion_averager.cpp
+SharedLibrary  : libopencv_tests.so
 Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
 
-02:41:53 Build Finished (took 373ms)
+10:19:35 Build Finished (took 1s.137ms)
 
