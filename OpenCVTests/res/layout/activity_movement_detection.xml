@@ -9,10 +9,23 @@
         android:id="@+id/java_surface_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_above="@+id/textBox"
+        opencv:camera_id="front" />
+
+    <EditText
+        android:id="@+id/textBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        opencv:camera_id="front" />
+        android:ems="10"
+        android:inputType="textMultiLine"
+        android:text="This is a big test" >
+
+        <requestFocus />
+    </EditText>
 
 </RelativeLayout>

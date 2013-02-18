@@ -7,25 +7,40 @@
 using namespace std;
 using namespace cv;
 
-#define ELEM(type,start,step,size,xpos,ypos) *((type*)(start+step*(ypos)+(xpos)*size))
+// generic version
+#define GENERIC_ELEM(type,start,step,size,xpos,ypos) *((type*)(start+step*(ypos)+(xpos)*size))
+
+// specific version
+#define ELEM(mat,xpos,ypos) *((unsigned char*)(mat.data+mat.step*(ypos)+(xpos)))
 
 extern "C" {
 
     const double EPSILON = 0.00001;
     
-JNIEXPORT jobject JNICALL Java_edu_washington_cs_opencvtests_MovementDetection_DetectMovementPosition(JNIEnv* env, jobject, jlong addrMat);
+JNIEXPORT jobject JNICALL Java_edu_washington_cs_opencvtests_MovementDetection_DetectMovementPosition(JNIEnv* env, jobject,
+                                                                                                      jlong currentFrameAddr,
+                                                                                                      jlong previousFrameAddr);
 
-JNIEXPORT jobject JNICALL Java_edu_washington_cs_opencvtests_MovementDetection_DetectMovementPosition(JNIEnv* env, jobject, jlong addrMat)
+JNIEXPORT jobject JNICALL Java_edu_washington_cs_opencvtests_MovementDetection_DetectMovementPosition(JNIEnv* env, jobject,
+                                                                                                      jlong currentFrameAddr,
+                                                                                                      jlong previousFrameAddr)
 {
-    Mat& input  = *(Mat*)addrMat;
+    Mat& currentFrame  = *(Mat*)currentFrameAddr;
+    Mat& previousFrame  = *(Mat*)previousFrameAddr;
+    
+    //absdiff(currentFrame, previousFrame, outputFrame);
+    
+    //blur(outputFrame, outputFrame, Point(5, 5));
     
     Point2d avg(-1.0, -1.0);
     double pointsCounted = 0.0;
 
-    for(int y = 0; y < input.rows; y++)
+    for(int y = 2; y < currentFrame.rows - 2; y++)
     {
-        for(int x = 0; x < input.cols; x++) {
-            if(ELEM(char, input.data, input.step, 1, x, y) == 0) {
+        for(int x = 2; x < currentFrame.cols - 2; x++) {
+            int currPixel = abs(ELEM(currentFrame, x, y) - ELEM(previousFrame, x, y));
+            
+            if(currPixel > 30) {
                 avg.x = (avg.x * pointsCounted + (double)x) / (pointsCounted + 1.0);
                 avg.y = (avg.y * pointsCounted + (double)y) / (pointsCounted + 1.0);
                 
@@ -41,7 +56,7 @@ JNIEXPORT jobject JNICALL Java_edu_washington_cs_opencvtests_MovementDetection_D
     
     cls = env->FindClass("edu/washington/cs/opencvtests/MotionDetectionReturnValue");
     constructor = env->GetMethodID(cls, "<init>", "(DDD)V");
-    object = env->NewObject(cls, constructor, avg.x, avg.y, pointsCounted / (double)(input.rows * input.cols));
+    object = env->NewObject(cls, constructor, avg.x, avg.y, pointsCounted / (double)(currentFrame.rows * currentFrame.cols));
 
     return object;
 }

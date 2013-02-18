@@ -10,15 +10,16 @@ import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
-import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
 import android.os.Bundle;
 import android.app.Activity;
+import android.text.Editable;
 import android.util.Log;
 import android.view.Menu;
 import android.view.SurfaceView;
 import android.view.WindowManager;
+import android.widget.EditText;
 
 public class MovementDetection extends Activity implements CvCameraViewListener {
 	protected static final String TAG = "MovementDetection";
@@ -34,10 +35,12 @@ public class MovementDetection extends Activity implements CvCameraViewListener 
 	//private static final double MAX_NON_DIRECTIONAL_MOTION_X = 40.0;
 	//private static final double MAX_NON_DIRECTIONAL_MOTION_Y = 40.0;
 	
-	private static final double MIN_DIRECTIONAL_MOTION_X     = 300.0;
-	private static final double MIN_DIRECTIONAL_MOTION_Y     = 150.0;
+	private double mMinDirectionalMotionX;
+	private double mMinDirectionalMotionY;
+	private double mWidthToHeight;
 	
 	private CameraBridgeViewBase mOpenCvCameraView;
+	private EditText mTextEditor;
 	
 	private Mat mPreviousFrame;
 	private Mat mCurrentFrame;
@@ -93,6 +96,8 @@ public class MovementDetection extends Activity implements CvCameraViewListener 
 	     
 	     mPreviousPos = new Point(0, 0);
 	     mStartPos = null;
+	     
+	     mTextEditor = (EditText) findViewById(R.id.textBox);
 	 }
 
 	 @Override
@@ -114,6 +119,14 @@ public class MovementDetection extends Activity implements CvCameraViewListener 
 		 mPreviousFrame = new Mat(height, width, CvType.CV_8U);
 		 mCurrentFrame = new Mat(height, width, CvType.CV_8U);
    	     mDifference = new Mat(height, width, CvType.CV_8U);
+   	     
+   	     mMinDirectionalMotionX = width / 3;
+   	     mMinDirectionalMotionY = height / 4;
+   	     
+   	     mWidthToHeight = width / height * 1.333;
+   	     
+   	     mTextEditor.setEnabled(false);
+   	     mTextEditor.setSelection(0, 1);
 	 }
 
 	 public void onCameraViewStopped() {
@@ -122,99 +135,132 @@ public class MovementDetection extends Activity implements CvCameraViewListener 
 	 public Mat onCameraFrame(Mat inputFrame) {
 		 // convert the input frame to gray-scale
 		 Imgproc.cvtColor(inputFrame, mCurrentFrame, Imgproc.COLOR_RGB2GRAY);
-		 Core.flip(mCurrentFrame, mCurrentFrame, 1);
 		 
-		 // get the difference between the current frame and the frame before it
-		 Core.absdiff(mCurrentFrame, mPreviousFrame, mDifference);
+		 // detect the motion
+		 MotionDetectionReturnValue mdret = DetectMovementPosition(mCurrentFrame.getNativeObjAddr(), mPreviousFrame.getNativeObjAddr());
 		 
-		 // process the resulting image to clean it up
-		 Imgproc.blur(mDifference, mDifference, new Size(5, 5));
-		 Imgproc.threshold(mDifference, mDifference, 30, 255, Imgproc.THRESH_BINARY_INV);
+		// set the previous frame to the current frame
+		mCurrentFrame.copyTo(mPreviousFrame);
 		 
-		 // set the previous frame to the current frame
-		 mCurrentFrame.copyTo(mPreviousFrame);
+		Direction movementDirection = Direction.None;
+		if(mStartPos == null && mdret.fractionOfScreenInMotion > MIN_FRACTION_SCREEN_MOTION) {
+			mStartPos = mdret.averagePosition;
+		}
+
+		else if(mStartPos != null && mdret.fractionOfScreenInMotion < MIN_FRACTION_SCREEN_MOTION) {
+			// check if it's a vertical move or a horizontal move
+			if(mPreviousPos.x - mStartPos.x > mMinDirectionalMotionX) {
+				movementDirection = Direction.Left;
+			}
+			else if(mStartPos.x - mPreviousPos.x > mMinDirectionalMotionX) {
+				movementDirection = Direction.Right;
+			}
+			
+			double verticalMotion = Math.abs(mPreviousPos.y - mStartPos.y);
+			if(verticalMotion > mMinDirectionalMotionY) {
+				if(movementDirection == Direction.None || verticalMotion * mWidthToHeight > Math.abs(mPreviousPos.x - mStartPos.x) ) {
+					if(mPreviousPos.y < mStartPos.y)
+						movementDirection = Direction.Up;
+					else
+						movementDirection = Direction.Down;
+				}
+			}
+			mStartPos = null;
+		}
+		
+		// keep up to date stats
+		updateStats(movementDirection);
+ 
+		mPreviousPos.x = mdret.averagePosition.x;
+		mPreviousPos.y = mdret.averagePosition.y;
+
+		Mat displayFrame = inputFrame;
 		 
-		 MotionDetectionReturnValue mdret = DetectMovementPosition(mDifference.getNativeObjAddr());
-		 
-		 Direction movementDirection = Direction.None;
-		 
-		 if(mStartPos == null && mdret.fractionOfScreenInMotion > MIN_FRACTION_SCREEN_MOTION) {
-			 mStartPos = mdret.averagePosition;
-		 }
-		 
-		 else if(mStartPos != null && mdret.fractionOfScreenInMotion < MIN_FRACTION_SCREEN_MOTION) {
-			 // check if it's a vertical move or a horizontal move
-			 if(mPreviousPos.x - mStartPos.x > MIN_DIRECTIONAL_MOTION_X) {
-				 movementDirection = Direction.Right;
-			 }
-			 
-			 else if(mStartPos.x - mPreviousPos.x > MIN_DIRECTIONAL_MOTION_X) {
-				 movementDirection = Direction.Left;
-			 }
-			 
-			 double verticalMotion = Math.abs(mPreviousPos.y - mStartPos.y);
-			 if(verticalMotion > MIN_DIRECTIONAL_MOTION_Y) {
-				 if(movementDirection == Direction.None || verticalMotion > Math.abs(mPreviousPos.x - mStartPos.x) * 2) {
-					 if(mPreviousPos.y < mStartPos.y)
-						 movementDirection = Direction.Up;
-					 else
-						 movementDirection = Direction.Down;
-				 }
-			 }
-			 
-			 mStartPos = null;
-		 }
-		 
-		 // keep up to date stats
-		 updateStats(movementDirection);
-		 
-		 mPreviousPos.x = mdret.averagePosition.x;
-		 mPreviousPos.y = mdret.averagePosition.y;
-		 
-		 /*Core.putText(
-				 mDifference,
+		 Core.putText(
+				 displayFrame,
 				 "(" + mdret.averagePosition.x + ", " + mdret.averagePosition.y + ")",
 				 new Point(5.0, 30.0),
 				 Core.FONT_HERSHEY_SIMPLEX,
 				 1.0,
-				 new Scalar(0, 0, 0));
+				 new Scalar(255, 0, 0));
 		 
 		 Core.putText(
-				 mDifference,
+				 displayFrame,
 				 "Percent of Screen In Motion: " + mdret.fractionOfScreenInMotion * 100.0 + "%",
 				 new Point(5.0, 60.0),
 				 Core.FONT_HERSHEY_SIMPLEX,
 				 1.0,
-				 new Scalar(0, 0, 0));*/
+				 new Scalar(255, 0, 0));
 		 
 		 Core.putText(
-				 mDifference,
+				 displayFrame,
 				 "{" + mLeft + ", " + mRight + ", " + mUp + ", " + mDown + "}",
 				 new Point(5.0, 90.0),
 				 Core.FONT_HERSHEY_SIMPLEX,
 				 1.0,
-				 new Scalar(0, 0, 0));
+				 new Scalar(255, 0, 0));
 		 
 		 
-		 return mDifference;
+		 return displayFrame;
 	 }
 	 
 	 private void updateStats(Direction dir) {
 		 switch(dir) {
 			case Down:
 				mDown++;
+				modulateSelectedText(dir);
 				break;
 			case Left:
 				mLeft++;
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						if(mTextEditor.getSelectionStart() > 0)
+							mTextEditor.setSelection(mTextEditor.getSelectionStart() - 1, mTextEditor.getSelectionEnd() - 1);
+					}
+				});
 				break;
 			case Right:
 				mRight++;
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						if(mTextEditor.getSelectionEnd() < mTextEditor.getText().length())
+							mTextEditor.setSelection(mTextEditor.getSelectionStart() + 1, mTextEditor.getSelectionEnd() + 1);
+					}
+				});
 				break;
 			case Up:
 				mUp++;
+				modulateSelectedText(dir);
 				break;
 			default:
 			break;
+		 }
+	 }
+	 
+	 private void modulateSelectedText(Direction d) {
+		 if(d == Direction.Up) {
+			 runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						Editable text = mTextEditor.getText();
+						int selectionIndex = mTextEditor.getSelectionStart();
+						String newstr = Character.toString((char) (text.charAt(mTextEditor.getSelectionStart()) - 1));
+						text.replace(selectionIndex, selectionIndex + 1, newstr);
+					}
+			 });
+		 }
+		 else {
+			 runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						Editable text = mTextEditor.getText();
+						int selectionIndex = mTextEditor.getSelectionStart();
+						String newstr = Character.toString((char) (text.charAt(mTextEditor.getSelectionStart()) + 1));
+						text.replace(selectionIndex, selectionIndex + 1, newstr);
+					}
+			 });
 		 }
 	 }
 
@@ -225,6 +271,6 @@ public class MovementDetection extends Activity implements CvCameraViewListener 
 		return true;
 	}
 	
-	public native MotionDetectionReturnValue DetectMovementPosition(long mat);
+	public native MotionDetectionReturnValue DetectMovementPosition(long currentFrame, long previousFrame);
 
 }
