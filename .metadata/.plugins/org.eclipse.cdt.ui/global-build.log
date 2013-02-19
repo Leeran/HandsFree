@@ -515,3 +515,194 @@ Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
 02:41:53 **** Incremental Build of configuration Debug for project OpenCVTests ****
 /Users/leeranraphaely/android-ndk-r8d/ndk-build all 
 Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+10:22:52 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Compile++ thumb  : opencv_tests <= motion_averager.cpp
+SharedLibrary  : libopencv_tests.so
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+10:23:31 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Compile++ thumb  : opencv_tests <= motion_averager.cpp
+SharedLibrary  : libopencv_tests.so
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+10:24:12 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Compile++ thumb  : opencv_tests <= motion_averager.cpp
+SharedLibrary  : libopencv_tests.so
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+10:24:43 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Compile++ thumb  : opencv_tests <= motion_averager.cpp
+SharedLibrary  : libopencv_tests.so
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+10:30:02 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+10:32:50 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+10:34:05 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+10:39:25 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+10:48:51 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+10:52:07 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+10:53:20 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+10:55:57 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+11:00:53 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+11:02:59 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Compile++ thumb  : opencv_tests <= motion_averager.cpp
+/Users/leeranraphaely/HandsFree/OpenCVTests/jni/motion_averager.cpp:23:103: error: expected identifier before ')' token
+/Users/leeranraphaely/HandsFree/OpenCVTests/jni/motion_averager.cpp: In function '_jobject* Java_edu_washington_cs_opencvtests_MovementDetection_DetectMovementPosition(JNIEnv*, jobject, jlong, jlong)':
+/Users/leeranraphaely/HandsFree/OpenCVTests/jni/motion_averager.cpp:27:126: error: declaration of C function '_jobject* Java_edu_washington_cs_opencvtests_MovementDetection_DetectMovementPosition(JNIEnv*, jobject, jlong, jlong)' conflicts with
+/Users/leeranraphaely/HandsFree/OpenCVTests/jni/motion_averager.cpp:20:27: error: previous declaration '_jobject* Java_edu_washington_cs_opencvtests_MovementDetection_DetectMovementPosition(JNIEnv*, jobject, jlong, jlong, int)' here
+make: *** [/Users/leeranraphaely/HandsFree/OpenCVTests/obj/local/armeabi-v7a/objs/opencv_tests/motion_averager.o] Error 1
+11:03:23 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Compile++ thumb  : opencv_tests <= motion_averager.cpp
+SharedLibrary  : libopencv_tests.so
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+11:03:25 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+11:09:04 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Compile++ thumb  : opencv_tests <= motion_averager.cpp
+SharedLibrary  : libopencv_tests.so
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+11:09:33 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+11:10:11 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Compile++ thumb  : opencv_tests <= motion_averager.cpp
+SharedLibrary  : libopencv_tests.so
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+11:12:47 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Compile++ thumb  : opencv_tests <= motion_averager.cpp
+SharedLibrary  : libopencv_tests.so
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+11:15:01 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+11:15:51 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+11:24:03 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+11:25:30 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+11:27:59 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+11:32:46 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+11:33:19 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+11:35:48 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+11:37:28 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+11:42:12 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+11:42:38 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+11:42:55 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+11:43:58 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+11:48:17 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+11:49:24 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+11:50:34 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+11:59:04 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+12:00:04 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+12:03:00 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+12:04:08 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+12:16:18 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+12:17:07 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+12:17:52 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+12:26:46 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+15:54:39 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+15:57:00 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+17:34:57 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+17:36:42 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Compile++ thumb  : opencv_tests <= motion_averager.cpp
+SharedLibrary  : libopencv_tests.so
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+17:37:40 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+18:26:16 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+18:27:51 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+18:29:39 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+18:30:50 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+18:31:44 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+18:38:53 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+18:39:32 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so

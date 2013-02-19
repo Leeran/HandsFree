@@ -29,6 +29,7 @@ public class MovementDetection extends Activity implements CvCameraViewListener 
 		None, Left, Right, Up, Down
 	} ;
 	
+	//private static final double START_MOTION_AT_FRACTION     = 0.03;
 	private static final double MIN_FRACTION_SCREEN_MOTION   = 0.1;
 	
 	// unused for now
@@ -44,12 +45,17 @@ public class MovementDetection extends Activity implements CvCameraViewListener 
 	
 	private Mat mPreviousFrame;
 	private Mat mCurrentFrame;
-	private Mat mDifference;
+	private Mat mOutput;
 	
 	private Point mStartPos;
 	private Point mPreviousPos;
 	
-	int mLeft, mRight, mUp, mDown;
+	// These are just diagnostics variables
+	private int mLeft, mRight, mUp, mDown;
+	private Point mLastStart, mLastStop;
+	private int numFrames;
+	
+	private Point mMinPoint, mMaxPoint;
 	
 	private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
 	    @Override
@@ -92,12 +98,20 @@ public class MovementDetection extends Activity implements CvCameraViewListener 
 	     mOpenCvCameraView.setCvCameraViewListener(this);
 	     mOpenCvCameraView.enableFpsMeter();
 	     
-	     mLeft = mRight = mUp = mDown = 0;
-	     
 	     mPreviousPos = new Point(0, 0);
 	     mStartPos = null;
 	     
+	     // just for diagnostics
+	     mLastStart = new Point(-1.0, -1.0);
+	     mLastStop = new Point(-1.0, -1.0);
+	     mLeft = mRight = mUp = mDown = 0;
+	     numFrames = 0;
+	     
 	     mTextEditor = (EditText) findViewById(R.id.textBox);
+	     
+	     mTextEditor.setText(getString(R.string.default_text));
+	     for(int i = 0; i < getResources().getInteger(R.integer.numLines) - 1; i++) 
+	    	 mTextEditor.append("\n" + getString(R.string.default_text));
 	 }
 
 	 @Override
@@ -118,12 +132,12 @@ public class MovementDetection extends Activity implements CvCameraViewListener 
 		// create our movement frames
 		 mPreviousFrame = new Mat(height, width, CvType.CV_8U);
 		 mCurrentFrame = new Mat(height, width, CvType.CV_8U);
-   	     mDifference = new Mat(height, width, CvType.CV_8U);
+   	     mOutput = new Mat(height, width, CvType.CV_8UC4);
    	     
-   	     mMinDirectionalMotionX = width / 3;
-   	     mMinDirectionalMotionY = height / 4;
+   	     mMinDirectionalMotionX = width / 5;
+   	     mMinDirectionalMotionY = height / 6;
    	     
-   	     mWidthToHeight = width / height * 1.333;
+   	     mWidthToHeight = (double)width / (double)height * 6.0 / 5.0;
    	     
    	     mTextEditor.setEnabled(false);
    	     mTextEditor.setSelection(0, 1);
@@ -133,8 +147,11 @@ public class MovementDetection extends Activity implements CvCameraViewListener 
 	 }
 
 	 public Mat onCameraFrame(Mat inputFrame) {
+		 // flip the input
+		 Core.flip(inputFrame, mOutput, 1);
+		 
 		 // convert the input frame to gray-scale
-		 Imgproc.cvtColor(inputFrame, mCurrentFrame, Imgproc.COLOR_RGB2GRAY);
+		 Imgproc.cvtColor(mOutput, mCurrentFrame, Imgproc.COLOR_RGB2GRAY);
 		 
 		 // detect the motion
 		 MotionDetectionReturnValue mdret = DetectMovementPosition(mCurrentFrame.getNativeObjAddr(), mPreviousFrame.getNativeObjAddr());
@@ -145,15 +162,18 @@ public class MovementDetection extends Activity implements CvCameraViewListener 
 		Direction movementDirection = Direction.None;
 		if(mStartPos == null && mdret.fractionOfScreenInMotion > MIN_FRACTION_SCREEN_MOTION) {
 			mStartPos = mdret.averagePosition;
+			numFrames = 0;
+			mMinPoint = roundPoint(mdret.averagePosition);
+			mMaxPoint = roundPoint(mdret.averagePosition);
 		}
 
 		else if(mStartPos != null && mdret.fractionOfScreenInMotion < MIN_FRACTION_SCREEN_MOTION) {
 			// check if it's a vertical move or a horizontal move
 			if(mPreviousPos.x - mStartPos.x > mMinDirectionalMotionX) {
-				movementDirection = Direction.Left;
+				movementDirection = Direction.Right;
 			}
 			else if(mStartPos.x - mPreviousPos.x > mMinDirectionalMotionX) {
-				movementDirection = Direction.Right;
+				movementDirection = Direction.Left;
 			}
 			
 			double verticalMotion = Math.abs(mPreviousPos.y - mStartPos.y);
@@ -165,7 +185,21 @@ public class MovementDetection extends Activity implements CvCameraViewListener 
 						movementDirection = Direction.Down;
 				}
 			}
+			
+			mLastStart = roundPoint(mStartPos);
+			mLastStop = roundPoint(mPreviousPos);
+			
 			mStartPos = null;
+		}
+		
+		// set diagnostics
+		if(mStartPos != null && mdret.fractionOfScreenInMotion > MIN_FRACTION_SCREEN_MOTION) {
+			numFrames++;
+			
+			if(mdret.averagePosition.x > mMaxPoint.x) mMaxPoint.x = Math.round(mdret.averagePosition.x); 
+			if(mdret.averagePosition.x < mMinPoint.x) mMinPoint.x = Math.round(mdret.averagePosition.x); 
+			if(mdret.averagePosition.y > mMaxPoint.y) mMaxPoint.y = Math.round(mdret.averagePosition.y); 
+			if(mdret.averagePosition.y < mMinPoint.y) mMinPoint.y = Math.round(mdret.averagePosition.y); 
 		}
 		
 		// keep up to date stats
@@ -174,7 +208,7 @@ public class MovementDetection extends Activity implements CvCameraViewListener 
 		mPreviousPos.x = mdret.averagePosition.x;
 		mPreviousPos.y = mdret.averagePosition.y;
 
-		Mat displayFrame = inputFrame;
+		Mat displayFrame = mOutput;
 		 
 		 Core.putText(
 				 displayFrame,
@@ -200,6 +234,26 @@ public class MovementDetection extends Activity implements CvCameraViewListener 
 				 1.0,
 				 new Scalar(255, 0, 0));
 		 
+		 if(mLastStart.x >= 0.0) {
+			 Core.circle(displayFrame, mLastStart, 10, new Scalar(0, 255, 0));
+			 Core.circle(displayFrame, mLastStop, 10, new Scalar(255, 255, 0));
+			 
+			 Core.circle(displayFrame, mMinPoint, 15, new Scalar(255, 165, 0));
+			 Core.circle(displayFrame, mMaxPoint, 15, new Scalar(255, 0, 255));
+			 
+			 Core.putText(
+					 displayFrame,
+					 "(Xdiff, Ydiff, Frames) = (" + Math.abs(mLastStart.x - mLastStop.x) + ", " + Math.abs(mLastStart.y - mLastStop.y) + ", " + numFrames + ")",
+					 new Point(5.0, 120.0),
+					 Core.FONT_HERSHEY_SIMPLEX,
+					 1.0,
+					 new Scalar(255, 255, 255));
+		 }
+		 
+		 if(mStartPos == null)
+			 Core.circle(displayFrame, mdret.averagePosition, 10, new Scalar(0, 0, 255));
+		 else
+			 Core.circle(displayFrame, mdret.averagePosition, 10, new Scalar(255, 0, 0));
 		 
 		 return displayFrame;
 	 }
@@ -208,7 +262,14 @@ public class MovementDetection extends Activity implements CvCameraViewListener 
 		 switch(dir) {
 			case Down:
 				mDown++;
-				modulateSelectedText(dir);
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						int newSelection = mTextEditor.getSelectionStart() + getString(R.string.default_text).length() + 1;
+						if(newSelection < mTextEditor.getText().length())
+							mTextEditor.setSelection(newSelection, newSelection + 1);
+					}
+				});
 				break;
 			case Left:
 				mLeft++;
@@ -232,7 +293,14 @@ public class MovementDetection extends Activity implements CvCameraViewListener 
 				break;
 			case Up:
 				mUp++;
-				modulateSelectedText(dir);
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						int newSelection = mTextEditor.getSelectionStart() - getString(R.string.default_text).length() - 1;
+						if(newSelection >= 0)
+							mTextEditor.setSelection(newSelection, newSelection + 1);
+					}
+				});
 				break;
 			default:
 			break;
@@ -262,6 +330,10 @@ public class MovementDetection extends Activity implements CvCameraViewListener 
 					}
 			 });
 		 }
+	 }
+	 
+	 private Point roundPoint(Point p) {
+		 return new Point(Math.round(p.x), Math.round(p.y));
 	 }
 
 	@Override
