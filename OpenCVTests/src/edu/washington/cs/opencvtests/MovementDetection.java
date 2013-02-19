@@ -20,6 +20,7 @@ import android.view.Menu;
 import android.view.SurfaceView;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.TextView;
 
 public class MovementDetection extends Activity implements CvCameraViewListener {
 	protected static final String TAG = "MovementDetection";
@@ -97,6 +98,7 @@ public class MovementDetection extends Activity implements CvCameraViewListener 
 	     mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
 	     mOpenCvCameraView.setCvCameraViewListener(this);
 	     mOpenCvCameraView.enableFpsMeter();
+	     mOpenCvCameraView.setMaxFrameSize(352, 288);
 	     
 	     mPreviousPos = new Point(0, 0);
 	     mStartPos = null;
@@ -203,12 +205,13 @@ public class MovementDetection extends Activity implements CvCameraViewListener 
 		}
 		
 		// keep up to date stats
-		updateStats(movementDirection);
+		updateStats(mdret, movementDirection);
  
 		mPreviousPos.x = mdret.averagePosition.x;
 		mPreviousPos.y = mdret.averagePosition.y;
 
 		Mat displayFrame = mOutput;
+		
 		 
 		 Core.putText(
 				 displayFrame,
@@ -220,7 +223,7 @@ public class MovementDetection extends Activity implements CvCameraViewListener 
 		 
 		 Core.putText(
 				 displayFrame,
-				 "Percent of Screen In Motion: " + mdret.fractionOfScreenInMotion * 100.0 + "%",
+				 mdret.fractionOfScreenInMotion * 100.0 + "%",
 				 new Point(5.0, 60.0),
 				 Core.FONT_HERSHEY_SIMPLEX,
 				 1.0,
@@ -241,9 +244,10 @@ public class MovementDetection extends Activity implements CvCameraViewListener 
 			 Core.circle(displayFrame, mMinPoint, 15, new Scalar(255, 165, 0));
 			 Core.circle(displayFrame, mMaxPoint, 15, new Scalar(255, 0, 255));
 			 
+			 // change in x, change in y, number of frames
 			 Core.putText(
 					 displayFrame,
-					 "(Xdiff, Ydiff, Frames) = (" + Math.abs(mLastStart.x - mLastStop.x) + ", " + Math.abs(mLastStart.y - mLastStop.y) + ", " + numFrames + ")",
+					 "(" + Math.abs(mLastStart.x - mLastStop.x) + ", " + Math.abs(mLastStart.y - mLastStop.y) + ", " + numFrames + ")",
 					 new Point(5.0, 120.0),
 					 Core.FONT_HERSHEY_SIMPLEX,
 					 1.0,
@@ -258,7 +262,7 @@ public class MovementDetection extends Activity implements CvCameraViewListener 
 		 return displayFrame;
 	 }
 	 
-	 private void updateStats(Direction dir) {
+	 private void updateStats(MotionDetectionReturnValue mdret, Direction dir) {
 		 switch(dir) {
 			case Down:
 				mDown++;
@@ -305,6 +309,19 @@ public class MovementDetection extends Activity implements CvCameraViewListener 
 			default:
 			break;
 		 }
+
+		 /*final StringBuilder statusText = new StringBuilder("(" + mdret.averagePosition.x + ", " + mdret.averagePosition.y + ")");
+		 statusText.append("\nPercent of Screen In Motion: " + mdret.fractionOfScreenInMotion * 100.0 + "%");
+		 statusText.append("\n{" + mLeft + ", " + mRight + ", " + mUp + ", " + mDown + "}");
+		 if(mLastStart.x >= 0.0) {
+			 statusText.append("(Xdiff, Ydiff, Frames) = (" + Math.abs(mLastStart.x - mLastStop.x) + ", " + Math.abs(mLastStart.y - mLastStop.y) + ", " + numFrames + ")");
+		 }
+		 runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					mStatusText.setText(statusText);
+				}
+		 });*/
 	 }
 	 
 	 private void modulateSelectedText(Direction d) {

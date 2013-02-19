@@ -14,7 +14,6 @@
 <fullyQualifiedTypeName name="org.opencv.android.CameraBridgeViewBase"/>
 <fullyQualifiedTypeName name="org.opencv.core.Mat"/>
 <fullyQualifiedTypeName name="android.view.WindowManager"/>
-<fullyQualifiedTypeName name="edu.washington.cs.opencvtests.R.id"/>
 <fullyQualifiedTypeName name="android.view.SurfaceView"/>
 <fullyQualifiedTypeName name="org.opencv.android.Utils"/>
 <fullyQualifiedTypeName name="org.opencv.core.CvType"/>
@@ -25,4 +24,8 @@
 <fullyQualifiedTypeName name="org.opencv.core.Point"/>
 <fullyQualifiedTypeName name="edu.washington.cs.opencvtests.MovementDetection.Direction"/>
 <fullyQualifiedTypeName name="android.text.Editable"/>
+<fullyQualifiedTypeName name="edu.washington.cs.opencvtests.R.id"/>
+<fullyQualifiedTypeName name="edu.washington.cs.opencvtests.R.integer"/>
+<fullyQualifiedTypeName name="edu.washington.cs.opencvtests.R.string"/>
+<fullyQualifiedTypeName name="android.widget.TextView"/>
 </qualifiedTypeNameHistroy>
