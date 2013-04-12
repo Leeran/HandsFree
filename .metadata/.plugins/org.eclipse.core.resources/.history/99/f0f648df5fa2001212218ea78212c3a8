@@ -1,0 +1,134 @@
+package edu.washington.cs.handsfreelibrary;
+
+import java.util.List;
+
+import org.opencv.android.BaseLoaderCallback;
+import org.opencv.android.LoaderCallbackInterface;
+import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.core.Size;
+import org.opencv.highgui.Highgui;
+import org.opencv.highgui.VideoCapture;
+
+import android.hardware.Camera;
+import android.hardware.Camera.CameraInfo;
+import android.util.Log;
+
+public class GestureSensor {
+	public interface Listener {
+		public void onGestureUp();
+		public void onGestureDown();
+		public void onGestureLeft();
+		public void onGestureRight();
+	}
+	
+	private VideoCapture mCamera;
+	private int mCameraId;
+	private Size mPreviewSize;
+	
+	private static final double MIN_FRACTION_SCREEN_MOTION   = 0.1;
+	
+	private double mMinDirectionalMotionX;
+	private double mMinDirectionalMotionY;
+	private double mWidthToHeight;
+	
+	private Mat mPreviousFrame;
+	private Mat mCurrentFrame;
+	private Mat mOutput;
+	
+	private Point mStartPos;
+	private Point mPreviousPos;
+	
+	private boolean mIsHorizontalScrollEnabled;
+	private boolean mIsVerticalScrollEnabled;
+	
+	private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
+	    @Override
+	    public void onManagerConnected(int status) {
+	        switch (status) {
+	            case LoaderCallbackInterface.SUCCESS:
+	            {
+	                Log.i(TAG, "OpenCV loaded successfully");
+	                
+	                System.loadLibrary("opencv_tests");
+	                
+	                // if I had more initialization steps, they would go here.
+	                
+	            } break;
+	            default:
+	            {
+	                super.onManagerConnected(status);
+	            } break;
+	        }
+	    }
+	};
+	
+	// a quick utility function to find the camera id
+	int getFrontCameraId() {
+		CameraInfo ci = new CameraInfo();
+		for (int i = 0 ; i < Camera.getNumberOfCameras(); i++) {
+	        Camera.getCameraInfo(i, ci);
+	        if (ci.facing == CameraInfo.CAMERA_FACING_FRONT) return i;
+	    }
+	    return 0; // No front-facing camera found
+	}
+	
+	public GestureSensor() {
+		mIsHorizontalScrollEnabled = true;
+		mIsVerticalScrollEnabled = true;
+		
+		// find the front facing camera id
+		mCameraId = getFrontCameraId();
+	}
+	
+	public void enableHorizontalScroll(boolean enabled) {
+		mIsHorizontalScrollEnabled = enabled;
+	}
+	
+	public boolean isHorizontalScrollEnabled() {
+		return mIsHorizontalScrollEnabled;
+	}
+	
+	public void enableVerticalScroll(boolean enabled) {
+		mIsVerticalScrollEnabled = enabled;
+	}
+	
+	public boolean isVerticalScrollEnabled() {
+		return mIsVerticalScrollEnabled;
+	}
+	
+	public void startSensor() {
+		mPreviousPos = new Point(0, 0);
+		mStartPos = null;
+		
+		if (mCamera != null) {
+			VideoCapture camera = mCamera;
+			mCamera = null; // Make it null before releasing...
+			camera.release();
+		}
+		
+		mCamera = new VideoCapture(mCameraId);
+
+		List<Size> previewSizes = mCamera.getSupportedPreviewSizes();
+		
+		double smallestPreviewSize = 640 * 480; // We should be smaller than this...
+		
+		double smallestWidth = 320; // Let's not get smaller than this...
+		
+		for (Size previewSize : previewSizes) {
+			if (previewSize.area() < smallestPreviewSize && previewSize.width >= smallestWidth) {
+				mPreviewSize = previewSize;
+			}
+		}
+		mCamera.set(Highgui.CV_CAP_PROP_FRAME_WIDTH, mPreviewSize.width);
+		mCamera.set(Highgui.CV_CAP_PROP_FRAME_HEIGHT, mPreviewSize.height);
+	}
+	
+	public void stopSensor() {
+		if (mCamera != null) {
+			VideoCapture camera = mCamera;
+			mCamera = null; // Make it null before releasing...
+			camera.release();
+		}
+	}
+}

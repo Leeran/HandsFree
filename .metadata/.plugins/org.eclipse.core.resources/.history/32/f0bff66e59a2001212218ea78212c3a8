@@ -1,0 +1,10 @@
+
+
+public class GestureSensor {
+	public interface Listener {
+		public void onGestureUp();
+		public void onGestureDown();
+		public void onGestureLeft();
+		public void onGestureRight();
+	}
+}
