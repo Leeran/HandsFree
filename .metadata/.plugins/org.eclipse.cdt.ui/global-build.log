@@ -1,11 +1,29 @@
-09:13:37 **** Incremental Build of configuration Debug for project HandsFreeLibrary ****
+19:03:35 **** Clean-only build of configuration Release for project HandsFreeLibrary ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build clean 
+Clean: gnustl_shared [armeabi-v7a]
+Clean: gnustl_static [armeabi-v7a]
+Clean: hands_free_library [armeabi-v7a]
+
+19:03:36 Build Finished (took 887ms)
+
+19:03:36 **** Incremental Build of configuration Release for project HandsFreeLibrary ****
 /Users/leeranraphaely/android-ndk-r8d/ndk-build all 
 Compile++ thumb  : hands_free_library <= motion_averager.cpp
+Prebuilt       : libgnustl_static.a <= <NDK>/sources/cxx-stl/gnu-libstdc++/4.6/libs/armeabi-v7a/
 SharedLibrary  : libhands_free_library.so
 Install        : libhands_free_library.so => libs/armeabi-v7a/libhands_free_library.so
-
-09:13:39 Build Finished (took 2s.584ms)
-
-09:13:40 **** Incremental Build of configuration Release for project HandsFreeLibrary ****
+19:03:39 **** Incremental Build of configuration Debug for project HandsFreeLibrary ****
 /Users/leeranraphaely/android-ndk-r8d/ndk-build all 
 Install        : libhands_free_library.so => libs/armeabi-v7a/libhands_free_library.so
+19:04:31 **** Incremental Build of configuration Debug for project HandsFreeLibrary ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libhands_free_library.so => libs/armeabi-v7a/libhands_free_library.so
+19:04:35 **** Incremental Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
+10:13:44 **** Build of configuration Debug for project HandsFreeLibrary ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libhands_free_library.so => libs/armeabi-v7a/libhands_free_library.so
+10:13:50 **** Build of configuration Debug for project OpenCVTests ****
+/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
+Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so

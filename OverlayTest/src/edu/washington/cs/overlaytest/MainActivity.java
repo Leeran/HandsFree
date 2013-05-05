@@ -1,33 +1,88 @@
 package edu.washington.cs.overlaytest;
 
 import android.os.Bundle;
+import android.os.IBinder;
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.view.Menu;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.CheckBox;
 
 public class MainActivity extends Activity implements OnClickListener {
 	protected static final String TAG = "MainActivity";
+	 
+	private Button mStartServiceButton;
+	private Button mStopServiceButton;
 	
-	private Button startServiceButton;
-	private Button stopServiceButton;
+	private CheckBox mClapToClick;
+	private CheckBox mAccelerometerToClick;
+	private CheckBox mColorToClick;
 	
-	private Intent serviceIntent;
+	private Intent mServiceIntent;
+	private SystemOverlay mSystemOverlay = null;
+	private ServiceConnection mSystemOverlayConnection = new ServiceConnection() {
+		@Override
+		public void onServiceConnected(ComponentName name, IBinder service) {
+			mSystemOverlay = ((SystemOverlay.SystemOverlayBinder)service).getService();
+			
+			mStartServiceButton.setEnabled(false);
+			mStopServiceButton.setEnabled(true);
+			
+			mClapToClick.setEnabled(true);
+			mClapToClick.setChecked(mSystemOverlay.isClapToClickEnabled());
+			
+			mAccelerometerToClick.setEnabled(true);
+			mAccelerometerToClick.setChecked(mSystemOverlay.isAccelerometerToClickEnabled());
+			
+			mColorToClick.setEnabled(true);
+			mColorToClick.setChecked(mSystemOverlay.isColorToClickEnabled());
+		}
+		@Override
+		public void onServiceDisconnected(ComponentName name) {
+			mSystemOverlay = null;
+			
+			mStartServiceButton.setEnabled(true);
+			mStopServiceButton.setEnabled(false);
+			mClapToClick.setEnabled(false);
+			mAccelerometerToClick.setEnabled(false);
+			mColorToClick.setEnabled(false);
+		}
+	};
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-		startServiceButton = (Button)findViewById(R.id.startService);
-		startServiceButton.setOnClickListener(this);
+		mStartServiceButton = (Button)findViewById(R.id.startService);
+		mStartServiceButton.setOnClickListener(this);
 		
-		stopServiceButton = (Button)findViewById(R.id.stopService);
-		stopServiceButton.setOnClickListener(this);
+		mStopServiceButton = (Button)findViewById(R.id.stopService);
+		mStopServiceButton.setOnClickListener(this);
 		
-		serviceIntent = new Intent(this, SystemOverlay.class);
+		mClapToClick = (CheckBox)findViewById(R.id.clap_to_click);
+		mClapToClick.setOnClickListener(this);
+		
+		mAccelerometerToClick = (CheckBox)findViewById(R.id.accelerometer_to_click);
+		mAccelerometerToClick.setOnClickListener(this);
+		
+		mColorToClick = (CheckBox)findViewById(R.id.color_to_click);
+		mColorToClick.setOnClickListener(this);
+		
+		mServiceIntent = new Intent(this, SystemOverlay.class);
+		bindService(mServiceIntent, mSystemOverlayConnection, 0);
+		
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
 	}
 
 	@Override
@@ -39,11 +94,26 @@ public class MainActivity extends Activity implements OnClickListener {
 
 	@Override
 	public void onClick(View v) {
-		if(v == startServiceButton) {
-			startService(serviceIntent);
+		if(v == mStartServiceButton) {
+			mStartServiceButton.setEnabled(false);
+			startService(mServiceIntent);
+			bindService(mServiceIntent, mSystemOverlayConnection, 0);
 		}
-		else if(v == stopServiceButton) {
-			stopService(serviceIntent);
+		else if(v == mStopServiceButton) {
+			mStopServiceButton.setEnabled(false);
+			stopService(mServiceIntent);
+		}
+		else if(v == mClapToClick) {
+			if(mSystemOverlay != null)
+				mSystemOverlay.enableClapToClick(mClapToClick.isChecked());
+		}
+		else if(v == mAccelerometerToClick) { 
+			if(mSystemOverlay != null)
+				mSystemOverlay.enableAccelerometerToClick(mAccelerometerToClick.isChecked());
+		}
+		else if(v == mColorToClick) { 
+			if(mSystemOverlay != null)
+				mSystemOverlay.enableColorToClick(mColorToClick.isChecked());
 		}
 	}
 

@@ -8,4 +8,5 @@ logcat.view.colsize.TID=46
 logcat.view.colsize.Tag=101
 logcat.view.colsize.Text=545
 logcat.view.colsize.Time=140
-logcat.view.filters.list=name\: 'Just audio', tag\: 'AudioTest', text\: '', pid\: '', app\: '', level\: 'verbose', 
+logcat.view.display.filters=false
+logcat.view.filters.list=name\: 'Just audio', tag\: 'AudioClickSensor', text\: '', pid\: '', app\: '', level\: 'verbose', name\: 'SystemOverlay messages', tag\: 'SystemOverlay', text\: '', pid\: '', app\: '', level\: 'verbose', name\: 'Accelerometer', tag\: 'AccelerometerClickSensor', text\: '', pid\: '', app\: '', level\: 'verbose', name\: 'ClapSensor', tag\: 'ClapSensor', text\: '', pid\: '', app\: '', level\: 'verbose', 

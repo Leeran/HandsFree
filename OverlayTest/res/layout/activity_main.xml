@@ -5,20 +5,129 @@
     tools:context=".MainActivity" >
 
     <Button
-        android:id="@+id/startService"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="173dp"
-        android:text="@string/start_service" />
-
-    <Button
         android:id="@+id/stopService"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
         android:layout_below="@+id/startService"
-        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="18dp"
+        android:enabled="false"
         android:text="@string/stop_service" />
+
+    <Button
+        android:id="@+id/startService"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/stopService"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="18dp"
+        android:text="@string/start_service" />
+
+    <CheckBox
+        android:id="@+id/clap_to_click"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/stopService"
+        android:layout_below="@+id/stopService"
+        android:layout_marginTop="20dp"
+        android:checked="true"
+        android:enabled="false"
+        android:text="@string/clap_to_click" />
+
+    <CheckBox
+        android:id="@+id/accelerometer_to_click"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/clap_to_click"
+        android:layout_below="@+id/clap_to_click"
+        android:checked="false"
+        android:enabled="false"
+        android:text="@string/accelerometer_to_click" />
+
+    <CheckBox
+        android:id="@+id/color_to_click"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/accelerometer_to_click"
+        android:layout_below="@+id/accelerometer_to_click"
+        android:enabled="false"
+        android:text="@string/color_to_click" />
+
+    <Button
+        android:id="@+id/button1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/color_to_click"
+        android:layout_below="@+id/color_to_click"
+        android:text="test1" />
+
+    <Button
+        android:id="@+id/Button01"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/startService"
+        android:layout_below="@+id/color_to_click"
+        android:text="test2" />
+
+    <Button
+        android:id="@+id/Button02"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/button1"
+        android:layout_alignBottom="@+id/button1"
+        android:layout_toRightOf="@+id/startService"
+        android:text="test3" />
+
+    <Button
+        android:id="@+id/Button03"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/button1"
+        android:layout_below="@+id/button1"
+        android:text="test4" />
+
+    <Button
+        android:id="@+id/Button04"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/Button01"
+        android:layout_toRightOf="@+id/button1"
+        android:text="test5" />
+
+    <Button
+        android:id="@+id/Button05"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/Button03"
+        android:layout_alignBottom="@+id/Button03"
+        android:layout_alignLeft="@+id/Button02"
+        android:text="test6" />
+
+    <Button
+        android:id="@+id/Button07"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/button1"
+        android:layout_below="@+id/button1"
+        android:layout_marginTop="52dp"
+        android:text="test7" />
+
+    <Button
+        android:id="@+id/Button08"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/Button07"
+        android:layout_alignBottom="@+id/Button07"
+        android:layout_alignLeft="@+id/Button04"
+        android:text="test8" />
+
+    <Button
+        android:id="@+id/Button06"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/Button08"
+        android:layout_alignBottom="@+id/Button08"
+        android:layout_toRightOf="@+id/Button08"
+        android:text="test9" />
 
 </RelativeLayout>

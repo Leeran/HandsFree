@@ -1,6 +1,6 @@
-09:13:40 **** Incremental Build of configuration Release for project HandsFreeLibrary ****
+10:13:44 **** Build of configuration Debug for project HandsFreeLibrary ****
 /Users/leeranraphaely/android-ndk-r8d/ndk-build all 
 Install        : libhands_free_library.so => libs/armeabi-v7a/libhands_free_library.so
 
-09:13:40 Build Finished (took 903ms)
+10:13:45 Build Finished (took 1s.803ms)
 
