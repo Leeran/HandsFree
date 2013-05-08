@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<session version="1.0">
-<refactoring comment="Move element &apos;GestureSensor.java&apos; to &apos;HandsFreeLibrary/src/edu.washington.cs.handsfreelibrary&apos;&#x0A;- Original project: &apos;HandsFreeLibrary&apos;&#x0A;- Destination element: &apos;HandsFreeLibrary/src/edu.washington.cs.handsfreelibrary&apos;&#x0A;- Original element: &apos;GestureSensor.java&apos;&#x0A;- Update references to refactored element" description="Move compilation unit" destination="/src&lt;edu.washington.cs.handsfreelibrary" element1="/src&lt;{GestureSensor.java" files="0" flags="589830" folders="0" id="org.eclipse.jdt.ui.move" policy="org.eclipse.jdt.ui.moveResources" qualified="false" references="true" stamp="1367546671050" units="1" version="1.0"/>
-</session>
