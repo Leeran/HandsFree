@@ -1,6 +1,9 @@
-10:13:44 **** Build of configuration Debug for project HandsFreeLibrary ****
-/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
-Install        : libhands_free_library.so => libs/armeabi-v7a/libhands_free_library.so
 
-10:13:45 Build Finished (took 1s.803ms)
+**** Clean-only build of configuration Release for project HandsFreeLibrary ****
 
+/Users/lzr/android-ndk-r8d/ndk-build clean 
+Clean: gnustl_shared [armeabi-v7a]
+Clean: gnustl_static [armeabi-v7a]
+Clean: hands_free_library [armeabi-v7a]
+
+**** Build Finished ****

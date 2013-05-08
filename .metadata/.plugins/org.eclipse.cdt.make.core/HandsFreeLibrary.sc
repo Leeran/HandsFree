@@ -4,6 +4,7 @@
 <scannerInfo id="org.eclipse.cdt.make.core.discoveredScannerInfo">
 <instance id="cdt.managedbuild.config.gnu.cross.exe.debug.1962256685;cdt.managedbuild.config.gnu.cross.exe.debug.1962256685.;cdt.managedbuild.tool.gnu.cross.c.compiler.1793275060;cdt.managedbuild.tool.gnu.c.compiler.input.467473385">
 <collector id="org.eclipse.cdt.make.core.PerProjectSICollector">
+<includePath path="/usr/lib/gcc/i686-apple-darwin10/4.2.1/include"/>
 <includePath path="/usr/llvm-gcc-4.2/bin/../lib/gcc/i686-apple-darwin11/4.2.1/include"/>
 <includePath path="/Applications/Xcode.app/Contents/Developer/usr/llvm-gcc-4.2/lib/gcc/i686-apple-darwin11/4.2.1/include"/>
 <includePath path="/usr/include"/>
@@ -15,6 +16,7 @@
 <definedSymbol symbol="__GNUC_MINOR__=2"/>
 <definedSymbol symbol="__GNUC_PATCHLEVEL__=1"/>
 <definedSymbol symbol="__APPLE_CC__=5658"/>
+<definedSymbol symbol="__APPLE_CC__=5666"/>
 <definedSymbol symbol="__llvm__=1"/>
 <definedSymbol symbol="__SIZE_TYPE__=long unsigned int"/>
 <definedSymbol symbol="__PTRDIFF_TYPE__=long int"/>
@@ -98,6 +100,7 @@
 <definedSymbol symbol="__REGISTER_PREFIX__="/>
 <definedSymbol symbol="__USER_LABEL_PREFIX__=_"/>
 <definedSymbol symbol="__VERSION__=&quot;4.2.1 (Based on Apple Inc. build 5658) (LLVM build 2336.11.00)&quot;"/>
+<definedSymbol symbol="__VERSION__=&quot;4.2.1 (Apple Inc. build 5666) (dot 3)&quot;"/>
 <definedSymbol symbol="__GNUC_GNU_INLINE__=1"/>
 <definedSymbol symbol="_LP64=1"/>
 <definedSymbol symbol="__LP64__=1"/>
@@ -125,6 +128,7 @@
 <definedSymbol symbol="__MACH__=1"/>
 <definedSymbol symbol="__APPLE__=1"/>
 <definedSymbol symbol="__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__=1074"/>
+<definedSymbol symbol="__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__=1068"/>
 <definedSymbol symbol="__CONSTANT_CFSTRINGS__=1"/>
 <definedSymbol symbol="__strong="/>
 <definedSymbol symbol="__weak=__attribute__((objc_gc(weak)))"/>
@@ -137,7 +141,9 @@
 <collector id="org.eclipse.cdt.make.core.PerProjectSICollector">
 <includePath path="/usr/llvm-gcc-4.2/bin/../lib/gcc/i686-apple-darwin11/4.2.1/include"/>
 <includePath path="/usr/include/c++/4.2.1"/>
+<includePath path="/usr/include/c++/4.2.1/i686-apple-darwin10/x86_64"/>
 <includePath path="/usr/include/c++/4.2.1/backward"/>
+<includePath path="/usr/lib/gcc/i686-apple-darwin10/4.2.1/include"/>
 <includePath path="/Applications/Xcode.app/Contents/Developer/usr/llvm-gcc-4.2/lib/gcc/i686-apple-darwin11/4.2.1/include"/>
 <includePath path="/usr/include"/>
 <includePath path="/System/Library/Frameworks (framework directory)" removed="true"/>
@@ -150,6 +156,7 @@
 <definedSymbol symbol="__GNUC_MINOR__=2"/>
 <definedSymbol symbol="__GNUC_PATCHLEVEL__=1"/>
 <definedSymbol symbol="__APPLE_CC__=5658"/>
+<definedSymbol symbol="__APPLE_CC__=5666"/>
 <definedSymbol symbol="__llvm__=1"/>
 <definedSymbol symbol="__SIZE_TYPE__=long unsigned int"/>
 <definedSymbol symbol="__PTRDIFF_TYPE__=long int"/>
@@ -236,6 +243,7 @@
 <definedSymbol symbol="__REGISTER_PREFIX__="/>
 <definedSymbol symbol="__USER_LABEL_PREFIX__=_"/>
 <definedSymbol symbol="__VERSION__=&quot;4.2.1 (Based on Apple Inc. build 5658) (LLVM build 2336.11.00)&quot;"/>
+<definedSymbol symbol="__VERSION__=&quot;4.2.1 (Apple Inc. build 5666) (dot 3)&quot;"/>
 <definedSymbol symbol="__GNUC_GNU_INLINE__=1"/>
 <definedSymbol symbol="_LP64=1"/>
 <definedSymbol symbol="__LP64__=1"/>
@@ -263,6 +271,7 @@
 <definedSymbol symbol="__MACH__=1"/>
 <definedSymbol symbol="__APPLE__=1"/>
 <definedSymbol symbol="__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__=1074"/>
+<definedSymbol symbol="__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__=1068"/>
 <definedSymbol symbol="__CONSTANT_CFSTRINGS__=1"/>
 <definedSymbol symbol="__strong="/>
 <definedSymbol symbol="__weak=__attribute__((objc_gc(weak)))"/>

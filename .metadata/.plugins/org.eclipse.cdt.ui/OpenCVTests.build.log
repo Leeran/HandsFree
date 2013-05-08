@@ -1,6 +1,8 @@
-10:13:50 **** Build of configuration Debug for project OpenCVTests ****
-/Users/leeranraphaely/android-ndk-r8d/ndk-build all 
-Install        : libopencv_tests.so => libs/armeabi-v7a/libopencv_tests.so
 
-10:13:51 Build Finished (took 901ms)
+**** Clean-only build of configuration Release for project OpenCVTests ****
 
+make clean 
+rm -rf  ./jni/motion_averager.o  ./jni/motion_averager.d  OpenCVTests
+ 
+
+**** Build Finished ****
