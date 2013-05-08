@@ -2,10 +2,13 @@ package edu.washington.cs.handsfreelibrary;
 
 import java.util.LinkedList;
 
+import com.musicg.dsp.FastFourierTransform;
+
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.util.Log;
+
 
 public class ClapSensor implements Runnable {
 	private static final String TAG = "ClapSensor";
@@ -16,11 +19,14 @@ public class ClapSensor implements Runnable {
 	private static final int BITS_PER_SAMPLE = 16; // make sure this matches audio format;
 	private static final int PREFERRED_BUFFER_SIZE = 2048;
 	
+	private static final double MIN_FREQUENCY = 4800;
+	
 	private static final int NUMBER_IN_LIST = 8;
-	private static final int MAX_LENGTH_OF_CLAP = 5; // in buffer size chunks
+	private static final int MAX_LENGTH_OF_CLAP = 4; // in buffer size chunks
 	private static final int TIME_TO_STAY_AVERAGE = 3; // also in buffer size chunks
-	private static final double MIN_CLAP_TO_SILENCE_RATIO = 8.0;
-	private static final double MIN_PRE_TO_POST_RATIO = 0.3;
+	private static final double DEFAULT_MIN_CLAP_TO_SILENCE_RATIO = 16.0;
+	
+	private static final double MAX_CURRENT_TO_PEAK_CLAP_RATIO = 0.33;
 	
 	// how many samples do we need before average can be ascertained
 	private AudioRecord mAudioRecorder;
@@ -31,16 +37,20 @@ public class ClapSensor implements Runnable {
 	private int mBufferSize;
 	
 	private byte [] mRawBuffer;
-	
+	private double [] mFloatingPointBuffer;
+	private double [] mFrequencySpectrum;
 		
 	Thread mReadAudioDataThread;
 	
 	private LinkedList<Double> mSampleAvgValueList;
 	private double mRunningAverage;
-	private double mOldAverage;
+	private int mMinIndexInFrequencySpectrum;
+	
+	private double mSensitivity;
 	
 	public ClapSensor() {
-		
+		FastFourierTransform transform = new FastFourierTransform();
+		transform.
 		// check if our preferred buffer is smaller than the min, and if it is, use the min
 		mBufferSize = Math.max(AudioRecord.getMinBufferSize(SAMPLE_RATE, CHANNEL_CONFIG, AUDIO_FORMAT), PREFERRED_BUFFER_SIZE);
 		
@@ -59,6 +69,8 @@ public class ClapSensor implements Runnable {
 		// allocate the data for the buffer such that sizeof(mBuffer) == mBufferSize
 		// (allocate mBufferSize / 2 because we're working with 16 bit shorts)
 		mRawBuffer = new byte[mBufferSize];
+		mFloatingPointBuffer = new double[mRawBuffer.length / 2];
+		mFrequencySpectrum = new double[mFloatingPointBuffer.length];
 		
 		mListener = null;
 		
@@ -67,6 +79,8 @@ public class ClapSensor implements Runnable {
 		mSampleAvgValueList = new LinkedList<Double>();
 		mRunningAverage = 0.0;
 		mOldAverage = -1.0;
+		
+		mSensitivity = DEFAULT_MIN_CLAP_TO_SILENCE_RATIO;
 	}
 	
 	public void start() {
@@ -108,6 +122,8 @@ public class ClapSensor implements Runnable {
 	private int clapCounter = 0;
 	private int breakCounter = 0;
 	
+	private double peakOfClap;
+	
 	@Override
 	public void run() {
 		while(mAudioRecorder.getRecordingState() == AudioRecord.RECORDSTATE_RECORDING) {
@@ -128,30 +144,37 @@ public class ClapSensor implements Runnable {
 			if(breakCounter == 0) {
 				// now, let's check if our latest number is far from the norm
 				if(mSampleAvgValueList.size() == NUMBER_IN_LIST && clapCounter == 0) {
-					if(averageAbsValue > mRunningAverage * MIN_CLAP_TO_SILENCE_RATIO) {
+					if(averageAbsValue > mRunningAverage * mSensitivity) {
 						// potential clap detected!
 						mOldAverage = mRunningAverage;
+						peakOfClap = averageAbsValue;
 						clapCounter++;
 					}
 				} else if(clapCounter >= MAX_LENGTH_OF_CLAP) {
 					// the clap lasted too long. Let's let it be.
+					logSampleAvgs("too long");
 					clapCounter = 0;
 					breakCounter = NUMBER_IN_LIST;
 				} else if(clapCounter > 0) {
 					// see if we're still at a "clap" point
-					if(getRatioBetween(averageAbsValue, mOldAverage) < MIN_PRE_TO_POST_RATIO)
+					if(averageAbsValue / peakOfClap >= MAX_CURRENT_TO_PEAK_CLAP_RATIO) {
+						if(peakOfClap < averageAbsValue && clapCounter < 2)
+							peakOfClap = averageAbsValue;
 						clapCounter++;
-					else {
+					} else {
+						logSampleAvgs("out of clap");
 						// we're out of the clap, I believe
 						mSampleAvgValueList.clear();
 						
 						clapCounter = -TIME_TO_STAY_AVERAGE;
 					}
 				} else if(clapCounter < 0) {
-					if(getRatioBetween(averageAbsValue, mOldAverage) >= MIN_PRE_TO_POST_RATIO) {
+					if(averageAbsValue / peakOfClap < MAX_CURRENT_TO_PEAK_CLAP_RATIO) {
 						clapCounter++;
-						if(clapCounter == 0 && mListener != null)
+						if(clapCounter == 0 && mListener != null) {
 							mListener.onSensorClick();
+							logSampleAvgs("on click");
+						}
 					}
 					else clapCounter = 0;
 				} 
@@ -168,7 +191,25 @@ public class ClapSensor implements Runnable {
 		}
 	}
 	
+	private void logSampleAvgs(String msg) {
+		String str = msg + " - Samples: "; 
+		for(Double d : mSampleAvgValueList) {
+			str += d.toString() + ", ";
+		}
+		Log.d(TAG, str);
+	}
+	
 	public boolean isStarted() {
 		return mIsStarted;
+	}
+	
+	// lower s's is more sensitive, higher s's is less sensitive.
+	public void setSensitivity(double s) {
+		if(s > 0.0)
+			mSensitivity = s;
+	}
+	
+	public double getSensitivity() {
+		return mSensitivity;
 	}
 }

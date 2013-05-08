@@ -23,7 +23,7 @@ public class AccelerometerClickSensor implements SensorEventListener {
 	private static final double MIN_ACCELERATIONY_FOR_CLICK = -0.35;
 	
 	private static final double MAX_ACCELERATIONZ_FOR_CLICK = 8.5;
-	private static final double MIN_ACCELERATIONZ_FOR_CLICK = 6.0;
+	private static final double MIN_ACCELERATIONZ_FOR_CLICK = -8.5;
 	private static final int BREAK_TIME = 10;
 	
 	private int mBreakTimer;
