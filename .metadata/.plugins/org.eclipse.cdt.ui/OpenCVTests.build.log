@@ -1,8 +1,0 @@
-
-**** Clean-only build of configuration Release for project OpenCVTests ****
-
-make clean 
-rm -rf  ./jni/motion_averager.o  ./jni/motion_averager.d  OpenCVTests
- 
-
-**** Build Finished ****
