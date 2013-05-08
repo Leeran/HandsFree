@@ -16,9 +16,22 @@ public class AccelerometerClickSensor implements SensorEventListener {
 	private SensorManager mSensorManager;
 	private Sensor mAccelerometer;
 	
+	private static final double MAX_ACCELERATIONX_FOR_CLICK = 0.35;
+	private static final double MIN_ACCELERATIONX_FOR_CLICK = -0.35;
+	
+	private static final double MAX_ACCELERATIONY_FOR_CLICK = 0.35;
+	private static final double MIN_ACCELERATIONY_FOR_CLICK = -0.35;
+	
+	private static final double MAX_ACCELERATIONZ_FOR_CLICK = 8.5;
+	private static final double MIN_ACCELERATIONZ_FOR_CLICK = 6.0;
+	private static final int BREAK_TIME = 10;
+	
+	private int mBreakTimer;
+	
 	public AccelerometerClickSensor(Context context) {
 		mListener = null;
 		mIsStarted = false;
+		mBreakTimer = 0;
 		
 		mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
 		mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -59,7 +72,14 @@ public class AccelerometerClickSensor implements SensorEventListener {
 		float ay = event.values[1];
 		float az = event.values[2];
 		
-		// record them as a log
+		if(mBreakTimer == 0) {
+			if(ax < MAX_ACCELERATIONX_FOR_CLICK && ay < MAX_ACCELERATIONY_FOR_CLICK && az < MAX_ACCELERATIONZ_FOR_CLICK &&
+			   ax > MIN_ACCELERATIONX_FOR_CLICK && ay > MIN_ACCELERATIONY_FOR_CLICK && az > MIN_ACCELERATIONZ_FOR_CLICK) {
+				mListener.onSensorClick();
+				mBreakTimer = BREAK_TIME;
+			}
+		} else mBreakTimer--;
+		
 		Log.d(TAG, String.format("Accelerometer: (%f, %f, %f", ax, ay, az));
 	}
 }
