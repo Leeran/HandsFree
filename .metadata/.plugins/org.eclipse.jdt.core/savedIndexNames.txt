@@ -1,9 +1,0 @@
-INDEX VERSION 1.126+/Users/lzr/Projects/HandsFree/.metadata/.plugins/org.eclipse.jdt.core
-3247289675.index
-867039442.index
-619512821.index
-25170364.index
-2740135075.index
-3416996988.index
-2772698000.index
-1969471208.index
