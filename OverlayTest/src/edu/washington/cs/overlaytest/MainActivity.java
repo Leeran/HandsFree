@@ -12,6 +12,7 @@ import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.Toast;
 
 public class MainActivity extends Activity implements OnClickListener {
 	protected static final String TAG = "MainActivity";
@@ -25,6 +26,9 @@ public class MainActivity extends Activity implements OnClickListener {
 	
 	private Intent mServiceIntent;
 	private SystemOverlay mSystemOverlay = null;
+	
+	private Toast mOldMessage = null;
+	
 	private ServiceConnection mSystemOverlayConnection = new ServiceConnection() {
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder service) {
@@ -74,6 +78,17 @@ public class MainActivity extends Activity implements OnClickListener {
 		mColorToClick = (CheckBox)findViewById(R.id.color_to_click);
 		mColorToClick.setOnClickListener(this);
 		
+		// assign the test buttons to listen to this
+		findViewById(R.id.test_button1).setOnClickListener(this);
+		findViewById(R.id.test_button2).setOnClickListener(this);
+		findViewById(R.id.test_button3).setOnClickListener(this);
+		findViewById(R.id.test_button4).setOnClickListener(this);
+		findViewById(R.id.test_button5).setOnClickListener(this);
+		findViewById(R.id.test_button6).setOnClickListener(this);
+		findViewById(R.id.test_button7).setOnClickListener(this);
+		findViewById(R.id.test_button8).setOnClickListener(this);
+		findViewById(R.id.test_button9).setOnClickListener(this);
+		
 		mServiceIntent = new Intent(this, SystemOverlay.class);
 		bindService(mServiceIntent, mSystemOverlayConnection, 0);
 		
@@ -114,6 +129,13 @@ public class MainActivity extends Activity implements OnClickListener {
 		else if(v == mColorToClick) { 
 			if(mSystemOverlay != null)
 				mSystemOverlay.enableColorToClick(mColorToClick.isChecked());
+		} else {
+			Button b = (Button)v;
+			// a test button has been hit
+			if(mOldMessage != null)
+				mOldMessage.cancel();
+			mOldMessage = Toast.makeText(this, "Button \"" + b.getText() + "\" clicked.", Toast.LENGTH_SHORT);
+			mOldMessage.show();
 		}
 	}
 
