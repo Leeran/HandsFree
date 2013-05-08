@@ -17,7 +17,7 @@ public class ClapSensor implements Runnable {
 	private static final int PREFERRED_BUFFER_SIZE = 2048;
 	
 	private static final int NUMBER_IN_LIST = 8;
-	private static final int MAX_LENGTH_OF_CLAP = 7; // in buffer size chunks
+	private static final int MAX_LENGTH_OF_CLAP = 5; // in buffer size chunks
 	private static final int TIME_TO_STAY_AVERAGE = 3; // also in buffer size chunks
 	private static final double MIN_CLAP_TO_SILENCE_RATIO = 8.0;
 	private static final double MIN_PRE_TO_POST_RATIO = 0.3;
