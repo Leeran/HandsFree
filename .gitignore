@@ -28,7 +28,44 @@
 
 # eclipse stuff #
 *.index
+*.snap
 .metadata/.plugins/org.eclipse.core.resources/.history/*
+savedIndexNames.txt
+0.png
+
+*.pydevproject
+.project
+.metadata
+bin/**
+tmp/**
+tmp/**/*
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.classpath
+.settings/
+.loadpath
+
+# External tool builders
+.externalToolBuilders/
+
+# Locally stored "Eclipse launch configurations"
+*.launch
+
+# CDT-specific
+.cproject
+
+# PDT-specific
+.buildpath
+
+# android stuff #
+R.txt
+R.java
+*.apk
+*.dex
+*.ap_
 
 # OS generated files #
 ######################
