@@ -19,12 +19,12 @@ public class ClapSensor implements Runnable {
 	private static final int BITS_PER_SAMPLE = 16; // make sure this matches audio format;
 	private static final int PREFERRED_BUFFER_SIZE = 2048;
 	
-	private static final double MIN_FREQUENCY = 4800;
+	private static final double MIN_FREQUENCY = 10000;
 	
 	private static final int NUMBER_IN_LIST = 8;
 	private static final int MAX_LENGTH_OF_CLAP = 4; // in buffer size chunks
 	private static final int TIME_TO_STAY_AVERAGE = 3; // also in buffer size chunks
-	private static final double DEFAULT_MIN_CLAP_TO_SILENCE_RATIO = 16.0;
+	private static final double DEFAULT_MIN_CLAP_TO_SILENCE_RATIO = 3.0;
 	
 	private static final double MAX_CURRENT_TO_PEAK_CLAP_RATIO = 0.33;
 	
@@ -145,8 +145,18 @@ public class ClapSensor implements Runnable {
 			
 			double [] frequencyBuckets = mFFT.getMagnitudes(mFloatingPointBuffer);
 			double releventAmplitude = 0.0;
+			double peekIntensity = frequencyBuckets[0];
+			int peekIndex = 0;
 			for(int i = mMinIndexInFrequencySpectrum; i < frequencyBuckets.length; i++) {
-				releventAmplitude += frequencyBuckets[i];
+				if(frequencyBuckets[i] > 6.0)
+					releventAmplitude += frequencyBuckets[i];
+			}
+			
+			for(int i = 1; i < 512; i++) {
+				if(frequencyBuckets[i] > peekIntensity) {
+					peekIntensity = frequencyBuckets[i];
+					peekIndex = i;
+				}
 			}
 			
 			if(breakCounter == 0) {
@@ -156,6 +166,7 @@ public class ClapSensor implements Runnable {
 						// potential clap detected!
 						// mOldAverage = mRunningAverage;
 						peakOfClap = releventAmplitude;
+						Log.d(TAG, "RA: " + releventAmplitude);
 						clapCounter++;
 					}
 				} else if(clapCounter >= MAX_LENGTH_OF_CLAP) {
