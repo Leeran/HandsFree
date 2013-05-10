@@ -23,6 +23,5 @@ C_UPPER_DEPS :=
 
 # Every subdirectory with source files must be described here
 SUBDIRS := \
-obj/local/armeabi-v7a/objs/opencv_tests \
 jni \
 
