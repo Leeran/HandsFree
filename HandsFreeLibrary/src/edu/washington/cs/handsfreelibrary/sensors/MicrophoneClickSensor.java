@@ -1,4 +1,4 @@
-package edu.washington.cs.handsfreelibrary;
+package edu.washington.cs.handsfreelibrary.sensors;
 
 import java.util.LinkedList;
 
@@ -8,7 +8,7 @@ import android.media.MediaRecorder;
 import android.util.Log;
 
 
-public class ClapSensor implements Runnable {
+public class MicrophoneClickSensor implements Runnable {
 	private static final String TAG = "ClapSensor";
 	
 	private static final int SAMPLE_RATE = 44100;
@@ -28,7 +28,7 @@ public class ClapSensor implements Runnable {
 	private AudioRecord mAudioRecorder;
 	private boolean mIsStarted;
 	
-	private ClickListener mListener;
+	private ClickSensorListener mListener;
 	
 	private int mBufferSize;
 	
@@ -41,7 +41,7 @@ public class ClapSensor implements Runnable {
 	
 	private double mSensitivity;
 	
-	public ClapSensor() {
+	public MicrophoneClickSensor() {
 		// check if our preferred buffer is smaller than the min, and if it is, use the min
 		mBufferSize = Math.max(AudioRecord.getMinBufferSize(SAMPLE_RATE, CHANNEL_CONFIG, AUDIO_FORMAT), PREFERRED_BUFFER_SIZE);
 		
@@ -94,7 +94,7 @@ public class ClapSensor implements Runnable {
 		}
 	}
 	
-	public void setListener(ClickListener listener) {
+	public void setListener(ClickSensorListener listener) {
 		mListener = listener;
 	}
 	

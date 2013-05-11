@@ -1,4 +1,4 @@
-package edu.washington.cs.handsfreelibrary;
+package edu.washington.cs.handsfreelibrary.sensors;
 
 import java.util.List;
 
@@ -40,7 +40,7 @@ public class GestureSensor {
 	} ;
 	
 	private Listener mGestureListener;
-	private ClickListener mClickListener;
+	private ClickSensorListener mClickListener;
 	
 	private VideoCapture mCamera;
 	private int mCameraId;
@@ -104,7 +104,7 @@ public class GestureSensor {
 		mGestureListener = listener;
 	}
 	
-	public void setClickLIstener(ClickListener listener) {
+	public void setClickLIstener(ClickSensorListener listener) {
 		mClickListener = listener;
 	}
 	

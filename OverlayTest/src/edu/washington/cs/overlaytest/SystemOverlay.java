@@ -7,10 +7,10 @@ import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 
-import edu.washington.cs.handsfreelibrary.AccelerometerClickSensor;
-import edu.washington.cs.handsfreelibrary.ClapSensor;
-import edu.washington.cs.handsfreelibrary.ClickListener;
-import edu.washington.cs.handsfreelibrary.GestureSensor;
+import edu.washington.cs.handsfreelibrary.sensors.AccelerometerClickSensor;
+import edu.washington.cs.handsfreelibrary.sensors.MicrophoneClickSensor;
+import edu.washington.cs.handsfreelibrary.sensors.ClickSensorListener;
+import edu.washington.cs.handsfreelibrary.sensors.GestureSensor;
 
 import android.app.Instrumentation;
 import android.app.Service;
@@ -30,7 +30,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Toast;
 
-public class SystemOverlay extends Service implements GestureSensor.Listener, ClickListener {
+public class SystemOverlay extends Service implements GestureSensor.Listener, ClickSensorListener {
 	protected static final String TAG = "SystemOverlay";
 	
 	private static final int CURSOR_RADIUS = 20;
@@ -40,7 +40,7 @@ public class SystemOverlay extends Service implements GestureSensor.Listener, Cl
 	
 	private OverlayView mView;
 	private GestureSensor mGestureSensor;
-	private ClapSensor mClapSensor;
+	private MicrophoneClickSensor mClapSensor;
 	private AccelerometerClickSensor mAccelerometerSensor;
 	
 	private Point mSize;
@@ -130,7 +130,7 @@ public class SystemOverlay extends Service implements GestureSensor.Listener, Cl
         super.onCreate();
         
         mGestureSensor = new GestureSensor(this);
-        mClapSensor = new ClapSensor();
+        mClapSensor = new MicrophoneClickSensor();
         mAccelerometerSensor = new AccelerometerClickSensor(this);
         
         mGestureSensor.setGestureListener(this);

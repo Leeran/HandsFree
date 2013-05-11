@@ -1,4 +1,4 @@
-package edu.washington.cs.handsfreelibrary;
+package edu.washington.cs.handsfreelibrary.sensors;
 
 import android.content.Context;
 import android.hardware.Sensor;
@@ -10,7 +10,7 @@ import android.util.Log;
 public class AccelerometerClickSensor implements SensorEventListener {
 	private static final String TAG = "AccelerometerClickSensor";
 	
-	private ClickListener mListener;
+	private ClickSensorListener mListener;
 	private boolean mIsStarted;
 	
 	private SensorManager mSensorManager;
@@ -37,7 +37,7 @@ public class AccelerometerClickSensor implements SensorEventListener {
 		mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 	}
 	
-	public void setListener(ClickListener listener) {
+	public void setListener(ClickSensorListener listener) {
 		mListener = listener;
 	}
 	

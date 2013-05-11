@@ -1,4 +1,4 @@
-package edu.washington.cs.handsfreelibrary;
+package edu.washington.cs.handsfreelibrary.sensors;
 
 import org.opencv.core.Point;
 
