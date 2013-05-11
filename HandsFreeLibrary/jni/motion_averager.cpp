@@ -17,15 +17,15 @@ extern "C" {
 
     const double EPSILON = 0.00001;
     
-JNIEXPORT jobject JNICALL Java_edu_washington_cs_handsfreelibrary_GestureSensor_DetectMovementPosition(JNIEnv* env, jobject,
-                                                                                                       jlong currentFrameAddr,
-                                                                                                       jlong previousFrameAddr/*,
-                                                                                                       jlong outputFrameAddr*/);
+JNIEXPORT jobject JNICALL Java_edu_washington_cs_handsfreelibrary_sensors_GestureSensor_DetectMovementPosition(JNIEnv* env, jobject,
+                                                                                                               jlong currentFrameAddr,
+                                                                                                               jlong previousFrameAddr/*,
+                                                                                                               jlong outputFrameAddr*/);
 
-JNIEXPORT jobject JNICALL Java_edu_washington_cs_handsfreelibrary_GestureSensor_DetectMovementPosition(JNIEnv* env, jobject,
-                                                                                                       jlong currentFrameAddr,
-                                                                                                       jlong previousFrameAddr/*,
-                                                                                                       jlong outputFrameAddr*/)
+JNIEXPORT jobject JNICALL Java_edu_washington_cs_handsfreelibrary_sensors_GestureSensor_DetectMovementPosition(JNIEnv* env, jobject,
+                                                                                                               jlong currentFrameAddr,
+                                                                                                               jlong previousFrameAddr/*,
+                                                                                                               jlong outputFrameAddr*/)
 {
     Mat& currentFrame  = *(Mat*)currentFrameAddr;
     Mat& previousFrame  = *(Mat*)previousFrameAddr;
@@ -57,7 +57,7 @@ JNIEXPORT jobject JNICALL Java_edu_washington_cs_handsfreelibrary_GestureSensor_
     jmethodID constructor;
     jclass cls;
     
-    cls = env->FindClass("edu/washington/cs/handsfreelibrary/MotionDetectionReturnValue");
+    cls = env->FindClass("edu/washington/cs/handsfreelibrary/sensors/MotionDetectionReturnValue");
     constructor = env->GetMethodID(cls, "<init>", "(DDD)V");
     object = env->NewObject(cls, constructor, avg.x, avg.y, pointsCounted / (double)(currentFrame.rows * currentFrame.cols));
 
