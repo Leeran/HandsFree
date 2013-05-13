@@ -29,7 +29,7 @@ public abstract class ClickSensor {
 	 * perceived.
 	 * @param listener the <code>ClickSensorListener</code> to be added
 	 */
-	public void addListener(ClickSensorListener listener) {
+	public void addClickListener(ClickSensorListener listener) {
 		mListeners.add(listener);
 	}
 	
@@ -37,7 +37,7 @@ public abstract class ClickSensor {
 	 * Removes a listener so it will no longer be called when a click is perceived.
 	 * @param listener the <code>ClickSensorListener</code> to be removed
 	 */
-	public void removeListener(ClickSensorListener listener) {
+	public void removeClickListener(ClickSensorListener listener) {
 		mListeners.remove(listener);
 	}
 	
@@ -47,16 +47,26 @@ public abstract class ClickSensor {
 	 * @param listener the <code>ClickSensorListener</code> who we are checking for local listener status
 	 * @return
 	 */
-	public boolean isListener(ClickSensorListener listener) {
+	public boolean isClickListener(ClickSensorListener listener) {
 		return mListeners.contains(listener);
 	}
 	
 	/**
 	 * Removes all listeners from <code>this</code>.
 	 */
-	public void clearListeners() {
+	public void clearClickListeners() {
 		mListeners.clear();
 	}
+	
+	/**
+	 * Causes this <code>ClickSensor</code> to start listening for clicks.
+	 */
+	abstract public void start();
+	
+	/**
+	 * Stops this <code>ClickSensor</code> from listening for clicks.
+	 */
+	abstract public void stop();
 	
 	/**
 	 * To be called by a derived class all listeners should have their <code>onSensorClick</code>

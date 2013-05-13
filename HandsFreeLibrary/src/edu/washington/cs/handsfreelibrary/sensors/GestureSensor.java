@@ -17,7 +17,12 @@ import android.view.Display;
 import android.view.Surface;
 import android.view.WindowManager;
 
-public class GestureSensor {
+/**
+ * 
+ * @author Leeran Raphaely <leeran.raphaely@gmail.com>
+ *
+ */
+public class GestureSensor extends ClickSensor {
 	public interface Listener {
 		public void onGestureUp();
 		public void onGestureDown();
@@ -40,7 +45,6 @@ public class GestureSensor {
 	} ;
 	
 	private Listener mGestureListener;
-	private ClickSensorListener mClickListener;
 	
 	private VideoCapture mCamera;
 	private int mCameraId;
@@ -69,7 +73,11 @@ public class GestureSensor {
 	private Context mContext;
 	
 	static public void loadLibrary() {
-		System.loadLibrary("hands_free_library");
+		try {
+			System.loadLibrary("hands_free_library");
+		} catch(UnsatisfiedLinkError e) {
+			
+		}
 	}
 	
 	// a quick utility function to find the camera id
@@ -90,7 +98,6 @@ public class GestureSensor {
 		mIsRunning = false;
 		
 		mGestureListener = null;
-		mClickListener = null;
 		
 		// find the front facing camera id
 		mCameraId = getFrontCameraId();
@@ -102,10 +109,6 @@ public class GestureSensor {
 	
 	public void setGestureListener(Listener listener) {
 		mGestureListener = listener;
-	}
-	
-	public void setClickLIstener(ClickSensorListener listener) {
-		mClickListener = listener;
 	}
 	
 	public void enableHorizontalScroll(boolean enabled) {
@@ -216,11 +219,11 @@ public class GestureSensor {
 					mCamera.retrieve(mCurrentFrame, Highgui.CV_CAP_ANDROID_GREY_FRAME);
 					
 					// see if we need to detect clicks by color, and if so, let's quickly get that out of the way
-					if(mIsClickByColorEnabled && mClickListener != null) {
+					if(mIsClickByColorEnabled) {
 						double avgColor = Core.mean(mCurrentFrame).val[0];
 						
 						if(avgColor < 30.0)
-							mClickListener.onSensorClick();
+							onSensorClick();
 					}
 					
 					// detect the motion

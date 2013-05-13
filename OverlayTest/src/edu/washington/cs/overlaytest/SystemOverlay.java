@@ -28,7 +28,6 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.Toast;
 
 public class SystemOverlay extends Service implements GestureSensor.Listener, ClickSensorListener {
 	protected static final String TAG = "SystemOverlay";
@@ -40,7 +39,7 @@ public class SystemOverlay extends Service implements GestureSensor.Listener, Cl
 	
 	private OverlayView mView;
 	private GestureSensor mGestureSensor;
-	private MicrophoneClickSensor mClapSensor;
+	private MicrophoneClickSensor mMicrophoneSensor;
 	private AccelerometerClickSensor mAccelerometerSensor;
 	
 	private Point mSize;
@@ -109,7 +108,7 @@ public class SystemOverlay extends Service implements GestureSensor.Listener, Cl
 	                
 	                // more initialization steps go here.
 	                mGestureSensor.start();
-	                mClapSensor.start();
+	                mMicrophoneSensor.start();
 	                
 	            } break;
 	            default:
@@ -130,13 +129,13 @@ public class SystemOverlay extends Service implements GestureSensor.Listener, Cl
         super.onCreate();
         
         mGestureSensor = new GestureSensor(this);
-        mClapSensor = new MicrophoneClickSensor();
+        mMicrophoneSensor = new MicrophoneClickSensor();
         mAccelerometerSensor = new AccelerometerClickSensor(this);
         
         mGestureSensor.setGestureListener(this);
-        mGestureSensor.setClickLIstener(this);
-        mClapSensor.setListener(this);
-        mAccelerometerSensor.setListener(this);
+        mGestureSensor.addClickListener(this);
+        mMicrophoneSensor.addClickListener(this);
+        mAccelerometerSensor.addClickListener(this);
         
         OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_2_4_3, this, mLoaderCallback);
         mView = new OverlayView(this);
@@ -175,7 +174,7 @@ public class SystemOverlay extends Service implements GestureSensor.Listener, Cl
             mView = null;
         }
         mGestureSensor.stop();
-        mClapSensor.stop();
+        mMicrophoneSensor.stop();
     }
     
 	class OverlayView extends ViewGroup {
@@ -275,27 +274,31 @@ public class SystemOverlay extends Service implements GestureSensor.Listener, Cl
 		new Thread() {
 			@Override
 			public void run() {
-				mInstrumentation.sendPointerSync(
-						MotionEvent.obtain(
-								SystemClock.uptimeMillis(), SystemClock.uptimeMillis(),
-								MotionEvent.ACTION_DOWN, screenPos.x, screenPos.y, 0));
-				mInstrumentation.sendPointerSync(
-						MotionEvent.obtain(
-								SystemClock.uptimeMillis(), SystemClock.uptimeMillis(),
-								MotionEvent.ACTION_UP, screenPos.x, screenPos.y, 0));
+				MotionEvent downAction = MotionEvent.obtain(
+						SystemClock.uptimeMillis(), SystemClock.uptimeMillis(),
+						MotionEvent.ACTION_DOWN, screenPos.x, screenPos.y, 0);
+				MotionEvent upAction = MotionEvent.obtain(
+						SystemClock.uptimeMillis(), SystemClock.uptimeMillis(),
+						MotionEvent.ACTION_UP, screenPos.x, screenPos.y, 0);
+				
+				mInstrumentation.sendPointerSync(downAction);
+				mInstrumentation.sendPointerSync(upAction);
+				
+				downAction.recycle();
+				upAction.recycle();
 			}
 		}.start();
 	}
 	
 	public void enableClapToClick(boolean enabled) {
 		if(enabled)
-			mClapSensor.start();
+			mMicrophoneSensor.start();
 		else
-			mClapSensor.stop();
+			mMicrophoneSensor.stop();
 	}
 
 	public boolean isClapToClickEnabled() {
-		return mClapSensor.isStarted();
+		return mMicrophoneSensor.isStarted();
 	}
 	
 	public void enableAccelerometerToClick(boolean enabled) {

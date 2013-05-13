@@ -7,10 +7,9 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.util.Log;
 
-public class AccelerometerClickSensor implements SensorEventListener {
+public class AccelerometerClickSensor extends ClickSensor implements SensorEventListener {
 	private static final String TAG = "AccelerometerClickSensor";
 	
-	private ClickSensorListener mListener;
 	private boolean mIsStarted;
 	
 	private SensorManager mSensorManager;
@@ -28,17 +27,16 @@ public class AccelerometerClickSensor implements SensorEventListener {
 	
 	private int mBreakTimer;
 	
+	/**
+	 * Creates a new <code>AccelerometerClickSensor</code>.
+	 * @param context A valid context is required to fetch data from the accelerometer.
+	 */
 	public AccelerometerClickSensor(Context context) {
-		mListener = null;
 		mIsStarted = false;
 		mBreakTimer = 0;
 		
 		mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
 		mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-	}
-	
-	public void setListener(ClickSensorListener listener) {
-		mListener = listener;
 	}
 	
 	public void start() {
@@ -75,7 +73,7 @@ public class AccelerometerClickSensor implements SensorEventListener {
 		if(mBreakTimer == 0) {
 			if(ax < MAX_ACCELERATIONX_FOR_CLICK && ay < MAX_ACCELERATIONY_FOR_CLICK && az < MAX_ACCELERATIONZ_FOR_CLICK &&
 			   ax > MIN_ACCELERATIONX_FOR_CLICK && ay > MIN_ACCELERATIONY_FOR_CLICK && az > MIN_ACCELERATIONZ_FOR_CLICK) {
-				mListener.onSensorClick();
+				onSensorClick();
 				mBreakTimer = BREAK_TIME;
 			}
 		} else mBreakTimer--;

@@ -8,27 +8,25 @@ import android.media.MediaRecorder;
 import android.util.Log;
 
 
-public class MicrophoneClickSensor implements Runnable {
+public class MicrophoneClickSensor extends ClickSensor implements Runnable {
 	private static final String TAG = "ClapSensor";
 	
 	private static final int SAMPLE_RATE = 44100;
 	private static final int CHANNEL_CONFIG = AudioFormat.CHANNEL_IN_MONO;
 	private static final int AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
-	private static final int BITS_PER_SAMPLE = 16; // make sure this matches audio format;
+	// private static final int BITS_PER_SAMPLE = 16; // make sure this matches audio format;
 	private static final int PREFERRED_BUFFER_SIZE = 2048;
 	
 	private static final int NUMBER_IN_LIST = 8;
 	private static final int MAX_LENGTH_OF_CLAP = 4; // in buffer size chunks
 	private static final int TIME_TO_STAY_AVERAGE = 3; // also in buffer size chunks
-	private static final double DEFAULT_MIN_CLAP_TO_SILENCE_RATIO = 16.0;
+	private static final double DEFAULT_MIN_CLAP_TO_SILENCE_RATIO = 8.0;
 	
 	private static final double MAX_CURRENT_TO_PEAK_CLAP_RATIO = 0.33;
 	
 	// how many samples do we need before average can be ascertained
 	private AudioRecord mAudioRecorder;
 	private boolean mIsStarted;
-	
-	private ClickSensorListener mListener;
 	
 	private int mBufferSize;
 	
@@ -61,8 +59,6 @@ public class MicrophoneClickSensor implements Runnable {
 		// (allocate mBufferSize / 2 because we're working with 16 bit shorts)
 		mRawBuffer = new byte[mBufferSize];
 		
-		mListener = null;
-		
 		mIsStarted = false;
 		
 		mSampleAvgValueList = new LinkedList<Double>();
@@ -94,18 +90,14 @@ public class MicrophoneClickSensor implements Runnable {
 		}
 	}
 	
-	public void setListener(ClickSensorListener listener) {
-		mListener = listener;
-	}
-	
 	// returns 1.0 if v1 == v2, and smaller numbers the further apart they are
-	private double getRatioBetween(double v1, double v2) {
+	/*private double getRatioBetween(double v1, double v2) {
 		if(v1 > v2) {
 			return v2 / v1;
 		} else {
 			return v1 / v2;
 		}
-	}
+	}*/
 	
 	private int clapCounter = 0;
 	private int breakCounter = 0;
@@ -128,6 +120,7 @@ public class MicrophoneClickSensor implements Runnable {
 				totalAbsValue += Math.abs(sample);
 			}
 			averageAbsValue = totalAbsValue / mRawBuffer.length / 2.0;
+			Log.d(TAG, "" + averageAbsValue);
 			
 			if(breakCounter == 0) {
 				// now, let's check if our latest number is far from the norm
@@ -159,8 +152,8 @@ public class MicrophoneClickSensor implements Runnable {
 				} else if(clapCounter < 0) {
 					if(averageAbsValue / peakOfClap < MAX_CURRENT_TO_PEAK_CLAP_RATIO) {
 						clapCounter++;
-						if(clapCounter == 0 && mListener != null) {
-							mListener.onSensorClick();
+						if(clapCounter == 0) {
+							onSensorClick();
 							logSampleAvgs("on click");
 						}
 					}
@@ -184,7 +177,7 @@ public class MicrophoneClickSensor implements Runnable {
 		for(Double d : mSampleAvgValueList) {
 			str += d.toString() + ", ";
 		}
-		Log.d(TAG, str);
+		//Log.d(TAG, str);
 	}
 	
 	public boolean isStarted() {
