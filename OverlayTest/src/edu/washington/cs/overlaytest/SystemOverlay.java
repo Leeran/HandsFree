@@ -8,6 +8,7 @@ import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 
 import edu.washington.cs.handsfreelibrary.sensors.AccelerometerClickSensor;
+import edu.washington.cs.handsfreelibrary.sensors.ClickSensor;
 import edu.washington.cs.handsfreelibrary.sensors.MicrophoneClickSensor;
 import edu.washington.cs.handsfreelibrary.sensors.ClickSensorListener;
 import edu.washington.cs.handsfreelibrary.sensors.GestureSensor;
@@ -132,7 +133,7 @@ public class SystemOverlay extends Service implements GestureSensor.Listener, Cl
         mMicrophoneSensor = new MicrophoneClickSensor();
         mAccelerometerSensor = new AccelerometerClickSensor(this);
         
-        mGestureSensor.setGestureListener(this);
+        mGestureSensor.addGestureListener(this);
         mGestureSensor.addClickListener(this);
         mMicrophoneSensor.addClickListener(this);
         mAccelerometerSensor.addClickListener(this);
@@ -215,7 +216,7 @@ public class SystemOverlay extends Service implements GestureSensor.Listener, Cl
     }
 
 	@Override
-	public synchronized void onGestureUp() {
+	public synchronized void onGestureUp(GestureSensor caller) {
 		if(mClickCounter == 0) {
 			mVelocity.x = 0;
 			if(mVelocity.y > 0)
@@ -226,7 +227,7 @@ public class SystemOverlay extends Service implements GestureSensor.Listener, Cl
 	}
 
 	@Override
-	public synchronized void onGestureDown() {
+	public synchronized void onGestureDown(GestureSensor caller) {
 		if(mClickCounter == 0) {
 			mVelocity.x = 0;
 			if(mVelocity.y < 0)
@@ -237,7 +238,7 @@ public class SystemOverlay extends Service implements GestureSensor.Listener, Cl
 	}
 
 	@Override
-	public synchronized void onGestureLeft() {
+	public synchronized void onGestureLeft(GestureSensor caller) {
 		if(mClickCounter == 0) {
 			mVelocity.y = 0;
 			if(mVelocity.x > 0)
@@ -248,7 +249,7 @@ public class SystemOverlay extends Service implements GestureSensor.Listener, Cl
 	}
 
 	@Override
-	public synchronized void onGestureRight() {
+	public synchronized void onGestureRight(GestureSensor caller) {
 		if(mClickCounter == 0) {
 			mVelocity.y = 0;
 			if(mVelocity.x < 0)
@@ -259,7 +260,7 @@ public class SystemOverlay extends Service implements GestureSensor.Listener, Cl
 	}
 
 	@Override
-	public void onSensorClick() {
+	public void onSensorClick(ClickSensor caller) {
 		mClickCounter = NUM_CLICK_FRAMES;
 		mVelocity.x = mVelocity.y = 0;
 		

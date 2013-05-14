@@ -1,5 +1,6 @@
 package edu.washington.cs.handsfreelibrary.sensors;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.opencv.core.Core;
@@ -18,16 +19,26 @@ import android.view.Surface;
 import android.view.WindowManager;
 
 /**
+ * <p><code>GestureSensor</code> takes input data from the camera and uses that to sense
+ * four gesture commands: up, down, left, and right.</p>
+ * 
+ * <p><strong>Important: The static function {@link loadLibrary} must be called after
+ * OpenCV is initiated and before <code>GestureSensor</code> is instantiated!</strong></p>
  * 
  * @author Leeran Raphaely <leeran.raphaely@gmail.com>
- *
  */
 public class GestureSensor extends ClickSensor {
+	/**
+	 * To receive messages from GestureSensor, classes must implement the <code>GestureSensor.Listener</code>
+	 * interface.
+	 * 
+	 * @author Leeran Raphaely <leeran.raphaely@gmail.com>
+	 */
 	public interface Listener {
-		public void onGestureUp();
-		public void onGestureDown();
-		public void onGestureLeft();
-		public void onGestureRight();
+		public void onGestureUp(GestureSensor caller);
+		public void onGestureDown(GestureSensor caller);
+		public void onGestureLeft(GestureSensor caller);
+		public void onGestureRight(GestureSensor caller);
 	}
 	
 	private enum Direction {
@@ -44,7 +55,7 @@ public class GestureSensor extends ClickSensor {
 		}
 	} ;
 	
-	private Listener mGestureListener;
+	private List<Listener> mGestureListeners;
 	
 	private VideoCapture mCamera;
 	private int mCameraId;
@@ -72,12 +83,12 @@ public class GestureSensor extends ClickSensor {
 	
 	private Context mContext;
 	
+	/**
+	 * To use a <code>GestureSensor</code> object, this must be called some time after 
+	 * OpenCV is initiated.
+	 */
 	static public void loadLibrary() {
-		try {
-			System.loadLibrary("hands_free_library");
-		} catch(UnsatisfiedLinkError e) {
-			
-		}
+		System.loadLibrary("hands_free_library");
 	}
 	
 	// a quick utility function to find the camera id
@@ -90,6 +101,10 @@ public class GestureSensor extends ClickSensor {
 	    return 0; // No front-facing camera found
 	}
 	
+	/**
+	 * Creates a new instance of GestureSensor. Remember to call {@link loadLibrary} 
+	 * @param context A {@link Context} object needed to get the screen rotation.
+	 */
 	public GestureSensor(Context context) {
 		mIsHorizontalScrollEnabled = true;
 		mIsVerticalScrollEnabled = true;
@@ -97,7 +112,7 @@ public class GestureSensor extends ClickSensor {
 		
 		mIsRunning = false;
 		
-		mGestureListener = null;
+		mGestureListeners = new LinkedList<Listener>();
 		
 		// find the front facing camera id
 		mCameraId = getFrontCameraId();
@@ -107,34 +122,108 @@ public class GestureSensor extends ClickSensor {
 		mFrameProcessor = new Thread(mProcessFramesRunnable);
 	}
 	
-	public void setGestureListener(Listener listener) {
-		mGestureListener = listener;
+	/**
+	 * Adds listener to the list of gesture listeners.
+	 * @param listener This object will have its call-back methods called when a gesture is recognized
+	 */
+	public void addGestureListener(Listener listener) {
+		mGestureListeners.add(listener);
 	}
 	
+	/**
+	 * Removes listener from the list of gesture listeners
+	 * @param listener The object will no longer have its call-back mehtods called by this gesture sensor.
+	 */
+	public void removeGestureListener(Listener listener) {
+		mGestureListeners.remove(listener);
+	}
+	
+	/**
+	 * Removes all gesture listeners.
+	 */
+	public void clearGestureListeners() {
+		mGestureListeners.clear();
+	}
+	
+	// these methods invoke gesture call backs on all listeners
+	private void onGestureUp() {
+		for(Listener l : mGestureListeners) {
+			l.onGestureUp(this);
+		}
+	}
+	
+	private void onGestureLeft() {
+		for(Listener l : mGestureListeners) {
+			l.onGestureLeft(this);
+		}
+	}
+	
+	private void onGestureRight() {
+		for(Listener l : mGestureListeners) {
+			l.onGestureRight(this);
+		}
+	}
+	
+	private void onGestureDown() {
+		for(Listener l : mGestureListeners) {
+			l.onGestureDown(this);
+		}
+	}
+	
+	/**
+	 * Enable/disable horizontal scroll.
+	 * @param enabled When true, onGestureLeft/onGestureRight are called, when false, they are not.
+	 */
 	public void enableHorizontalScroll(boolean enabled) {
 		mIsHorizontalScrollEnabled = enabled;
 	}
 	
+	/**
+	 * Test if horizontal scroll is enabled.
+	 * @return true if horizontal scroll is enabled, false otherwise.
+	 */
 	public boolean isHorizontalScrollEnabled() {
 		return mIsHorizontalScrollEnabled;
 	}
 	
+	/**
+	 * Enable/disable vertical scroll.
+	 * @param enabled When true, onGestureUp/onGestureDown are called, when false, they are not.
+	 */
 	public void enableVerticalScroll(boolean enabled) {
 		mIsVerticalScrollEnabled = enabled;
 	}
 	
+	/**
+	 * Test if vertical scroll is enabled.
+	 * @return true if vertical scroll is enabled, false otherwise.
+	 */
 	public boolean isVerticalScrollEnabled() {
 		return mIsVerticalScrollEnabled;
 	}
 	
+	/**
+	 * When enabled, an onSensorClick command is sent to any click listeners when a large enough
+	 * percentage of the screen goes black.
+	 * 
+	 * @param enabled Set whether click-by-color is enabled
+	 */
 	public void enableClickByColor(boolean enabled) {
 		mIsClickByColorEnabled = enabled;
 	}
 	
+	/**
+	 * Test if click by color is enabled.
+	 * @return true if click by color is enabled, false otherwise.
+	 */
 	public boolean isClickByColorEnabled() {
 		return mIsClickByColorEnabled;
 	}
 	
+	/**
+	 * Causes this to start reading camera input and looking for gestures. The camera must be available
+	 * for this method to be successful.
+	 */
 	public void start() {
 		mPreviousPos = new Point(0, 0);
 		mStartPos = null;
@@ -175,6 +264,9 @@ public class GestureSensor extends ClickSensor {
   	    mFrameProcessor.start();
 	}
 	
+	/**
+	 * Stops this from looking at camera input for gestures, thus freeing the camera for other uses.
+	 */
 	public void stop() {
 		mIsRunning = false;
 		if (mCamera != null) {
@@ -265,16 +357,16 @@ public class GestureSensor extends ClickSensor {
 					}
 					
 					// see if we should call a callback based on movementDirection
-					if(mGestureListener != null && movementDirection != Direction.None) {
+					if(mGestureListeners.size() != 0 && movementDirection != Direction.None) {
 						int adjustedDirection = adjustDirectionForScreenRotation(movementDirection);
 						if(adjustedDirection == Direction.Left.toInt())
-							mGestureListener.onGestureLeft();
+							onGestureLeft();
 						else if(adjustedDirection == Direction.Right.toInt())
-							mGestureListener.onGestureRight();
+							onGestureRight();
 						else if(adjustedDirection == Direction.Up.toInt())
-							mGestureListener.onGestureUp();
+							onGestureUp();
 						else if(adjustedDirection == Direction.Down.toInt())
-							mGestureListener.onGestureDown();
+							onGestureDown();
 					}
 					
 					mPreviousPos.x = mdret.averagePosition.x;
@@ -284,5 +376,5 @@ public class GestureSensor extends ClickSensor {
 		}
 	};
 	
-	public native MotionDetectionReturnValue DetectMovementPosition(long currentFrame, long previousFrame);
+	private native MotionDetectionReturnValue DetectMovementPosition(long currentFrame, long previousFrame);
 }

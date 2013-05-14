@@ -7,8 +7,12 @@ import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.util.Log;
 
-
-public class MicrophoneClickSensor extends ClickSensor implements Runnable {
+/**
+ * Listen for amplitude spikes coming from the microphone to detect clips. This class is meant to
+ * detect claps, snaps, and any other sort of audio clicks.
+ * @author Leeran Raphaely <leeran.raphaely@gmail.com>
+ */
+public class MicrophoneClickSensor extends ClickSensor {
 	private static final String TAG = "ClapSensor";
 	
 	private static final int SAMPLE_RATE = 44100;
@@ -32,13 +36,16 @@ public class MicrophoneClickSensor extends ClickSensor implements Runnable {
 	
 	private byte [] mRawBuffer;
 		
-	Thread mReadAudioDataThread;
+	private Thread mReadAudioDataThread;
 	
 	private LinkedList<Double> mSampleAvgValueList;
 	private double mRunningAverage;
 	
 	private double mSensitivity;
 	
+	/**
+	 * Creates a new instance of <code>MicrophoneClickSensor</code>
+	 */
 	public MicrophoneClickSensor() {
 		// check if our preferred buffer is smaller than the min, and if it is, use the min
 		mBufferSize = Math.max(AudioRecord.getMinBufferSize(SAMPLE_RATE, CHANNEL_CONFIG, AUDIO_FORMAT), PREFERRED_BUFFER_SIZE);
@@ -67,17 +74,24 @@ public class MicrophoneClickSensor extends ClickSensor implements Runnable {
 		mSensitivity = DEFAULT_MIN_CLAP_TO_SILENCE_RATIO;
 	}
 	
+	/**
+	 * Start retrieving data from the microphone, and sending <code>onSensorClick</code> messages
+	 * to listeners when a click is sensed. 
+	 */
 	public void start() {
 		if(!mIsStarted) {
 			mAudioRecorder.startRecording();
 			
-			mReadAudioDataThread = new Thread(this);
+			mReadAudioDataThread = new Thread(mThreadRunnable);
 			mReadAudioDataThread.start();
 			
 			mIsStarted = true;
 		}
 	}
 	
+	/**
+	 * Stop retrieving data from the microphone.
+	 */
 	public void stop() {
 		if(mIsStarted) {
 			mAudioRecorder.stop();
@@ -104,73 +118,75 @@ public class MicrophoneClickSensor extends ClickSensor implements Runnable {
 	
 	private double peakOfClap;
 	
-	@Override
-	public void run() {
-		while(mAudioRecorder.getRecordingState() == AudioRecord.RECORDSTATE_RECORDING) {
-			// read in the next set of clap data
-			mAudioRecorder.read(mRawBuffer, 0, mRawBuffer.length);
-			
-			// average the amplitudes of the data set
-			short sample = 0;
-			int totalAbsValue = 0;
-			double averageAbsValue = 0.0;
-			
-			for(int i = 0; i < mRawBuffer.length; i+=2) {
-				sample = (short)((mRawBuffer[i]) | mRawBuffer[i + 1] << 8);
-				totalAbsValue += Math.abs(sample);
-			}
-			averageAbsValue = totalAbsValue / mRawBuffer.length / 2.0;
-			Log.d(TAG, "" + averageAbsValue);
-			
-			if(breakCounter == 0) {
-				// now, let's check if our latest number is far from the norm
-				if(mSampleAvgValueList.size() == NUMBER_IN_LIST && clapCounter == 0) {
-					if(averageAbsValue > mRunningAverage * mSensitivity) {
-						// potential clap detected!
-						// mOldAverage = mRunningAverage;
-						peakOfClap = averageAbsValue;
-						clapCounter++;
-					}
-				} else if(clapCounter >= MAX_LENGTH_OF_CLAP) {
-					// the clap lasted too long. Let's let it be.
-					logSampleAvgs("too long");
-					clapCounter = 0;
-					breakCounter = NUMBER_IN_LIST;
-				} else if(clapCounter > 0) {
-					// see if we're still at a "clap" point
-					if(averageAbsValue / peakOfClap >= MAX_CURRENT_TO_PEAK_CLAP_RATIO) {
-						if(peakOfClap < averageAbsValue && clapCounter < 2)
+	private Runnable mThreadRunnable = new Runnable() {
+		@Override
+		public void run() {
+			while(mAudioRecorder.getRecordingState() == AudioRecord.RECORDSTATE_RECORDING) {
+				// read in the next set of clap data
+				mAudioRecorder.read(mRawBuffer, 0, mRawBuffer.length);
+				
+				// average the amplitudes of the data set
+				short sample = 0;
+				int totalAbsValue = 0;
+				double averageAbsValue = 0.0;
+				
+				for(int i = 0; i < mRawBuffer.length; i+=2) {
+					sample = (short)((mRawBuffer[i]) | mRawBuffer[i + 1] << 8);
+					totalAbsValue += Math.abs(sample);
+				}
+				averageAbsValue = totalAbsValue / mRawBuffer.length / 2.0;
+				Log.d(TAG, "" + averageAbsValue);
+				
+				if(breakCounter == 0) {
+					// now, let's check if our latest number is far from the norm
+					if(mSampleAvgValueList.size() == NUMBER_IN_LIST && clapCounter == 0) {
+						if(averageAbsValue > mRunningAverage * mSensitivity) {
+							// potential clap detected!
+							// mOldAverage = mRunningAverage;
 							peakOfClap = averageAbsValue;
-						clapCounter++;
-					} else {
-						logSampleAvgs("out of clap");
-						// we're out of the clap, I believe
-						mSampleAvgValueList.clear();
-						
-						clapCounter = -TIME_TO_STAY_AVERAGE;
-					}
-				} else if(clapCounter < 0) {
-					if(averageAbsValue / peakOfClap < MAX_CURRENT_TO_PEAK_CLAP_RATIO) {
-						clapCounter++;
-						if(clapCounter == 0) {
-							onSensorClick();
-							logSampleAvgs("on click");
+							clapCounter++;
 						}
-					}
-					else clapCounter = 0;
-				} 
-			} else breakCounter--;
-			
-			// update the average
-			mRunningAverage *= mSampleAvgValueList.size();
-			
-			mSampleAvgValueList.add(averageAbsValue);
-			if(mSampleAvgValueList.size() > NUMBER_IN_LIST) {
-				mRunningAverage -= mSampleAvgValueList.pop();
+					} else if(clapCounter >= MAX_LENGTH_OF_CLAP) {
+						// the clap lasted too long. Let's let it be.
+						logSampleAvgs("too long");
+						clapCounter = 0;
+						breakCounter = NUMBER_IN_LIST;
+					} else if(clapCounter > 0) {
+						// see if we're still at a "clap" point
+						if(averageAbsValue / peakOfClap >= MAX_CURRENT_TO_PEAK_CLAP_RATIO) {
+							if(peakOfClap < averageAbsValue && clapCounter < 2)
+								peakOfClap = averageAbsValue;
+							clapCounter++;
+						} else {
+							logSampleAvgs("out of clap");
+							// we're out of the clap, I believe
+							mSampleAvgValueList.clear();
+							
+							clapCounter = -TIME_TO_STAY_AVERAGE;
+						}
+					} else if(clapCounter < 0) {
+						if(averageAbsValue / peakOfClap < MAX_CURRENT_TO_PEAK_CLAP_RATIO) {
+							clapCounter++;
+							if(clapCounter == 0) {
+								onSensorClick();
+								logSampleAvgs("on click");
+							}
+						}
+						else clapCounter = 0;
+					} 
+				} else breakCounter--;
+				
+				// update the average
+				mRunningAverage *= mSampleAvgValueList.size();
+				
+				mSampleAvgValueList.add(averageAbsValue);
+				if(mSampleAvgValueList.size() > NUMBER_IN_LIST) {
+					mRunningAverage -= mSampleAvgValueList.pop();
+				}
+				mRunningAverage = (mRunningAverage + averageAbsValue) / mSampleAvgValueList.size();
 			}
-			mRunningAverage = (mRunningAverage + averageAbsValue) / mSampleAvgValueList.size();
 		}
-	}
+	};
 	
 	private void logSampleAvgs(String msg) {
 		String str = msg + " - Samples: "; 
@@ -180,16 +196,28 @@ public class MicrophoneClickSensor extends ClickSensor implements Runnable {
 		//Log.d(TAG, str);
 	}
 	
+	/**
+	 * Check whether this is looking at microphone data right now.
+	 * @return true if this is looking at microphone data, false otherwise.
+	 */
 	public boolean isStarted() {
 		return mIsStarted;
 	}
 	
-	// lower s's is more sensitive, higher s's is less sensitive.
+	/**
+	 * Adjusts how sensitive the microphone is to clap data. The lower the sensitivity constant,
+	 * the more sensitive this sensor is. The higher, the less sensitive. Default value is 8.0.
+	 * @param s The sensitivity constant.
+	 */
 	public void setSensitivity(double s) {
 		if(s > 0.0)
 			mSensitivity = s;
 	}
 	
+	/**
+	 * Gets the sensitivity constant.
+	 * @return The sensitivity constant.
+	 */
 	public double getSensitivity() {
 		return mSensitivity;
 	}

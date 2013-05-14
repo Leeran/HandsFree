@@ -2,6 +2,10 @@ package edu.washington.cs.handsfreelibrary.sensors;
 
 import org.opencv.core.Point;
 
+/**
+ * Only used within the package to get data from JNI.
+ * @author Leeran Raphaely <leeran.raphaely@gmail.com>
+ */
 public class MotionDetectionReturnValue {
 	public Point averagePosition;
 	public double fractionOfScreenInMotion;

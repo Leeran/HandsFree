@@ -7,7 +7,7 @@ import java.util.List;
  * Class <code>ClickSensor</code> is an abstract base class to all other click
  * sensors. It defines a list of click listeners, as well as the basic methods
  * used by outsiders to add and remove listeners. Classes derived from <code>
- * ClickSensor</code> may use the protected {@link onSensorClick() onSensorClick}
+ * ClickSensor</code> may use the protected {@link onSensorClick}
  * to call all the listeners at once.
  * 
  * @author Leeran Raphaely <leeran.raphaely@gmail.com>
@@ -74,7 +74,7 @@ public abstract class ClickSensor {
 	 */
 	protected void onSensorClick() {
 		for(ClickSensorListener listener : mListeners) {
-			listener.onSensorClick();
+			listener.onSensorClick(this);
 		}
 	}
 }
