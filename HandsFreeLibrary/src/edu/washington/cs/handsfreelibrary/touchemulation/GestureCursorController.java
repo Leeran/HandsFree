@@ -3,36 +3,30 @@ package edu.washington.cs.handsfreelibrary.touchemulation;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.opencv.android.BaseLoaderCallback;
-import org.opencv.android.LoaderCallbackInterface;
-import org.opencv.android.OpenCVLoader;
-
 import android.app.Instrumentation;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.PixelFormat;
 import android.graphics.Point;
-import android.os.Binder;
-import android.os.IBinder;
 import android.os.SystemClock;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
-import edu.washington.cs.handsfreelibrary.sensors.AccelerometerClickSensor;
 import edu.washington.cs.handsfreelibrary.sensors.ClickSensor;
 import edu.washington.cs.handsfreelibrary.sensors.ClickSensorListener;
 import edu.washington.cs.handsfreelibrary.sensors.GestureSensor;
-import edu.washington.cs.handsfreelibrary.sensors.MicrophoneClickSensor;
 
+/**
+ * Class <code>GestureCursorController</code> can be used to create the visual and functionality of a
+ * cursor that is controlled via gestures. To use this class, one must create a {@link GestureSensor}
+ * object and add <code>this</code> to 
+ * @author Leeran Raphaely <leeran.raphaely@gmail.com>
+ *
+ */
 public class GestureCursorController implements GestureSensor.Listener, ClickSensorListener {
 	protected static final String TAG = "GestureCursorController";
 	
-	private static final int CURSOR_RADIUS = 20;
+	private static final int DEFAULT_CURSOR_RADIUS = 20;
 	
 	private static final int MILLISECONDS_PER_FRAME = 7;
 	private static final int NUM_CLICK_FRAMES = 50;
@@ -43,12 +37,13 @@ public class GestureCursorController implements GestureSensor.Listener, ClickSen
 	private Point mPosition;
 	private Point mVelocity;
 	
+	private int mCursorRadius;
+	
 	private boolean mIsRunning;
 	
 	private int mClickCounter;
 	
 	private Instrumentation mInstrumentation;
-	
 	
 	// create the animation timer
 	private TimerTask mAnimationTimerTask = new TimerTask() {
@@ -57,26 +52,31 @@ public class GestureCursorController implements GestureSensor.Listener, ClickSen
 			synchronized(GestureCursorController.this) {
 				if(mVelocity.x != 0 || mVelocity.y != 0 || mClickCounter != 0) mView.postInvalidate();
 				
-				if(mPosition.x < 0) {
-					mPosition.x = 0;
-					mVelocity.x = 0;
+				if(mSize.x == 0 || mSize.y == 0) {
+					mPosition.x = mPosition.y = 0;
+					mVelocity.x = mVelocity.y = 0;
+				} else {
+					if(mPosition.x < 0) {
+						mPosition.x = 0;
+						mVelocity.x = 0;
+					}
+					else if(mPosition.x >= mSize.x) {
+						mPosition.x = mSize.x-1;
+						mVelocity.x = 0;
+					}
+					
+					if(mPosition.y < 0) {
+						mPosition.y = 0;
+						mVelocity.y = 0;
+					}
+					else if(mPosition.y >= mSize.y) {
+						mPosition.y = mSize.y - 1;
+						mVelocity.y = 0;
+					}
+					
+					mPosition.x += mVelocity.x;
+					mPosition.y += mVelocity.y;
 				}
-				else if(mPosition.x >= mSize.x) {
-					mPosition.x = mSize.x-1;
-					mVelocity.x = 0;
-				}
-				
-				if(mPosition.y < 0) {
-					mPosition.y = 0;
-					mVelocity.y = 0;
-				}
-				else if(mPosition.y >= mSize.y) {
-					mPosition.y = mSize.y - 1;
-					mVelocity.y = 0;
-				}
-				
-				mPosition.x += mVelocity.x;
-				mPosition.y += mVelocity.y;
 				
 				if(mClickCounter > 0) {
 					mClickCounter--;
@@ -100,6 +100,8 @@ public class GestureCursorController implements GestureSensor.Listener, ClickSen
         
         mClickCounter = 0;
         
+        mCursorRadius = DEFAULT_CURSOR_RADIUS;
+        
         mIsRunning = false;
         
         mInstrumentation = new Instrumentation();
@@ -122,17 +124,27 @@ public class GestureCursorController implements GestureSensor.Listener, ClickSen
     	}
     }
     
+    
+    
+    public void setIdleColor(int c) {
+		mView.mNormalPaint.setColor(c);
+	}
+	
+	public void setClickColor(int c) {
+		mView.mClickPaint.setColor(c);
+	}
+	
+	public void setCursorRadius(int r) {
+		mCursorRadius = r;
+	}
+	
+	public View getView() {
+		return mView;
+	}
+    
 	private class GestureCursorView extends ViewGroup {
-    	private Paint mNormalPaint;
-    	private Paint mClickPaint;
-    	
-    	public void setIdleColor(int c) {
-    		mNormalPaint.setColor(c);
-    	}
-    	
-    	public void setClickColor(int c) {
-    		mClickPaint.setColor(c);
-    	}
+    	public Paint mNormalPaint;
+    	public Paint mClickPaint;
 
 	    public GestureCursorView(Context context) {
 	    	super(context);
@@ -148,12 +160,12 @@ public class GestureCursorController implements GestureSensor.Listener, ClickSen
 
 	    @Override
 	    protected void onDraw(Canvas canvas) {
-	    	synchronized(SystemOverlay.this) {
+	    	synchronized(GestureCursorController.this) {
 	    		super.onDraw(canvas);
 	    		if(mClickCounter == 0)
-	    			canvas.drawCircle(mPosition.x, mPosition.y, CURSOR_RADIUS, mNormalPaint);
+	    			canvas.drawCircle(mPosition.x, mPosition.y, mCursorRadius, mNormalPaint);
 	    		else 
-	    			canvas.drawCircle(mPosition.x, mPosition.y, CURSOR_RADIUS, mClickPaint);
+	    			canvas.drawCircle(mPosition.x, mPosition.y, mCursorRadius, mClickPaint);
 	    	}
 	    }
 
@@ -213,7 +225,6 @@ public class GestureCursorController implements GestureSensor.Listener, ClickSen
 
 	@Override
 	public void onSensorClick(ClickSensor caller) {
-		mClickCounter = NUM_CLICK_FRAMES;
 		mVelocity.x = mVelocity.y = 0;
 		
 		final Point screenPos = new Point(mPosition.x, mPosition.y);
@@ -234,8 +245,13 @@ public class GestureCursorController implements GestureSensor.Listener, ClickSen
 						SystemClock.uptimeMillis(), SystemClock.uptimeMillis(),
 						MotionEvent.ACTION_UP, screenPos.x, screenPos.y, 0);
 				
-				mInstrumentation.sendPointerSync(downAction);
-				mInstrumentation.sendPointerSync(upAction);
+				try {
+					mInstrumentation.sendPointerSync(downAction);
+					mInstrumentation.sendPointerSync(upAction);
+					mClickCounter = NUM_CLICK_FRAMES;
+				} catch (SecurityException e) {
+					// security exception occurred, but we can pretty much ignore it.
+				}
 				
 				downAction.recycle();
 				upAction.recycle();
