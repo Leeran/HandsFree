@@ -87,6 +87,10 @@ public class GestureCursorController implements GestureSensor.Listener, ClickSen
     };
     private Timer mAnimationTimer;
 	
+    /**
+     * Creates a new <code>GestureCursorController</code> object.
+     * @param context A context from the application.
+     */
     public GestureCursorController(Context context) {
         mView = new GestureCursorView(context);
         
@@ -94,9 +98,6 @@ public class GestureCursorController implements GestureSensor.Listener, ClickSen
         
         mPosition = new Point(0, 0);
         mVelocity = new Point(0, 0);
-        
-        mAnimationTimer = new Timer();
-        mAnimationTimer.schedule(mAnimationTimerTask, 0, MILLISECONDS_PER_FRAME);
         
         mClickCounter = 0;
         
@@ -107,16 +108,25 @@ public class GestureCursorController implements GestureSensor.Listener, ClickSen
         mInstrumentation = new Instrumentation();
     }
     
+    /**
+     * Starts this instance of <code>GestureCursorController</code>, meaning the cursor will be drawn
+     * onto the view, and clicks will be sent to the application below.
+     */
     public synchronized void start() {
-    	mIsRunning = true;
-    	mAnimationTimer = new Timer();
-        mAnimationTimer.schedule(mAnimationTimerTask, 0, MILLISECONDS_PER_FRAME);
-        
-        mPosition = new Point(mSize.x / 2, mSize.y / 2);
-        mVelocity = new Point(0, 0);
-        mClickCounter = 0;
+    	if(!mIsRunning) {
+	    	mIsRunning = true;
+	    	mAnimationTimer = new Timer();
+	        mAnimationTimer.schedule(mAnimationTimerTask, 0, MILLISECONDS_PER_FRAME);
+	        
+	        mPosition = new Point(mSize.x / 2, mSize.y / 2);
+	        mVelocity = new Point(0, 0);
+	        mClickCounter = 0;
+    	}
     }
 
+    /**
+     * Stops the instance from acting as a cursor, which will no longer be drawn on the view.
+     */
     public synchronized void stop() {
     	if(mIsRunning) {
 			mAnimationTimer.cancel();
@@ -124,20 +134,33 @@ public class GestureCursorController implements GestureSensor.Listener, ClickSen
     	}
     }
     
-    
-    
+    /**
+     * Set the color of the cursor when not clicking.
+     * @param c the color-int that the cursor will be set to
+     */
     public void setIdleColor(int c) {
 		mView.mNormalPaint.setColor(c);
 	}
 	
+    /**
+     * Set the color of the cursor when clicking.
+     * @param c the color-int that the cursor will be set to when clicking
+     */
 	public void setClickColor(int c) {
 		mView.mClickPaint.setColor(c);
 	}
 	
+	/**
+	 * Set the radius of the cursor
+	 * @param r the radius of the cursor
+	 */
 	public void setCursorRadius(int r) {
 		mCursorRadius = r;
 	}
 	
+	/**
+	 * @return the view that contains the cursor (clicking won't work unless the view is attached to something)
+	 */
 	public View getView() {
 		return mView;
 	}
@@ -176,6 +199,12 @@ public class GestureCursorController implements GestureSensor.Listener, ClickSen
 		        mPosition.x = mSize.x / 2; mPosition.y = mSize.y / 2;
 		        mVelocity.x = mVelocity.y = 0;
 	    	}
+	    }
+	    
+	    @Override
+	    public boolean onInterceptTouchEvent (MotionEvent ev) {
+	    	onTouchEvent(ev);
+	    	return false;
 	    }
     }
 
