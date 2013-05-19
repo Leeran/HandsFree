@@ -209,7 +209,7 @@ public class GestureCursorController implements GestureSensor.Listener, ClickSen
     }
 
 	@Override
-	public synchronized void onGestureUp(GestureSensor caller) {
+	public synchronized void onGestureUp(GestureSensor caller, long gestureLength) {
 		if(mClickCounter == 0) {
 			mVelocity.x = 0;
 			if(mVelocity.y > 0)
@@ -220,7 +220,7 @@ public class GestureCursorController implements GestureSensor.Listener, ClickSen
 	}
 
 	@Override
-	public synchronized void onGestureDown(GestureSensor caller) {
+	public synchronized void onGestureDown(GestureSensor caller, long gestureLength) {
 		if(mClickCounter == 0) {
 			mVelocity.x = 0;
 			if(mVelocity.y < 0)
@@ -231,7 +231,7 @@ public class GestureCursorController implements GestureSensor.Listener, ClickSen
 	}
 
 	@Override
-	public synchronized void onGestureLeft(GestureSensor caller) {
+	public synchronized void onGestureLeft(GestureSensor caller, long gestureLength) {
 		if(mClickCounter == 0) {
 			mVelocity.y = 0;
 			if(mVelocity.x > 0)
@@ -242,7 +242,7 @@ public class GestureCursorController implements GestureSensor.Listener, ClickSen
 	}
 
 	@Override
-	public synchronized void onGestureRight(GestureSensor caller) {
+	public synchronized void onGestureRight(GestureSensor caller, long gestureLength) {
 		if(mClickCounter == 0) {
 			mVelocity.y = 0;
 			if(mVelocity.x < 0)

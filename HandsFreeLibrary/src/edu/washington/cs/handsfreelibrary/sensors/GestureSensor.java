@@ -14,6 +14,7 @@ import org.opencv.highgui.VideoCapture;
 import android.content.Context;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
+import android.util.Log;
 import android.view.Display;
 import android.view.Surface;
 import android.view.WindowManager;
@@ -28,6 +29,8 @@ import android.view.WindowManager;
  * @author Leeran Raphaely <leeran.raphaely@gmail.com>
  */
 public class GestureSensor extends ClickSensor {
+	private static final String TAG = "GestureSensor";
+	
 	/**
 	 * To receive messages from GestureSensor, classes must implement the <code>GestureSensor.Listener</code>
 	 * interface.
@@ -35,10 +38,33 @@ public class GestureSensor extends ClickSensor {
 	 * @author Leeran Raphaely <leeran.raphaely@gmail.com>
 	 */
 	public interface Listener {
-		public void onGestureUp(GestureSensor caller);
-		public void onGestureDown(GestureSensor caller);
-		public void onGestureLeft(GestureSensor caller);
-		public void onGestureRight(GestureSensor caller);
+		/**
+		 * Called when an up gesture is triggered
+		 * @param caller the GestureSensor object that made the call
+		 * @param gestureLength the amount of time the gesture took in milliseconds
+		 */
+		public void onGestureUp(GestureSensor caller, long gestureLength);
+		
+		/**
+		 * Called when a down gesture is triggered
+		 * @param caller the GestureSensor object that made the call
+		 * @param gestureLength the amount of time the gesture took in milliseconds
+		 */
+		public void onGestureDown(GestureSensor caller, long gestureLength);
+		
+		/**
+		 * Called when a left gesture is triggered
+		 * @param caller the GestureSensor object that made the call
+		 * @param gestureLength the amount of time the gesture took in milliseconds
+		 */
+		public void onGestureLeft(GestureSensor caller, long gestureLength);
+		
+		/**
+		 * Called when a right gesture is triggered
+		 * @param caller the GestureSensor object that made the call
+		 * @param gestureLength the amount of time the gesture took in milliseconds
+		 */
+		public void onGestureRight(GestureSensor caller, long gestureLength);
 	}
 	
 	private enum Direction {
@@ -54,6 +80,8 @@ public class GestureSensor extends ClickSensor {
 			return numVal;
 		}
 	} ;
+	
+	private final static double DEFAULT_AVERAGE_COLOR_MAX_FOR_CLICK = 30.0;
 	
 	private List<Listener> mGestureListeners;
 	
@@ -83,6 +111,10 @@ public class GestureSensor extends ClickSensor {
 	
 	private Context mContext;
 	
+	private double mAverageColorMaxForClick;
+	
+	private long mStartGestureTime;
+	
 	/**
 	 * To use a <code>GestureSensor</code> object, this must be called some time after 
 	 * OpenCV is initiated.
@@ -111,6 +143,8 @@ public class GestureSensor extends ClickSensor {
 		mIsClickByColorEnabled = false;
 		
 		mIsRunning = false;
+		
+		mAverageColorMaxForClick = DEFAULT_AVERAGE_COLOR_MAX_FOR_CLICK;
 		
 		mGestureListeners = new LinkedList<Listener>();
 		
@@ -146,27 +180,27 @@ public class GestureSensor extends ClickSensor {
 	}
 	
 	// these methods invoke gesture call backs on all listeners
-	private void onGestureUp() {
+	private void onGestureUp(long gestureLength) {
 		for(Listener l : mGestureListeners) {
-			l.onGestureUp(this);
+			l.onGestureUp(this, gestureLength);
 		}
 	}
 	
-	private void onGestureLeft() {
+	private void onGestureLeft(long gestureLength) {
 		for(Listener l : mGestureListeners) {
-			l.onGestureLeft(this);
+			l.onGestureLeft(this, gestureLength);
 		}
 	}
 	
-	private void onGestureRight() {
+	private void onGestureRight(long gestureLength) {
 		for(Listener l : mGestureListeners) {
-			l.onGestureRight(this);
+			l.onGestureRight(this, gestureLength);
 		}
 	}
 	
-	private void onGestureDown() {
+	private void onGestureDown(long gestureLength) {
 		for(Listener l : mGestureListeners) {
-			l.onGestureDown(this);
+			l.onGestureDown(this, gestureLength);
 		}
 	}
 	
@@ -314,7 +348,7 @@ public class GestureSensor extends ClickSensor {
 					if(mIsClickByColorEnabled) {
 						double avgColor = Core.mean(mCurrentFrame).val[0];
 						
-						if(avgColor < 30.0)
+						if(avgColor < mAverageColorMaxForClick)
 							onSensorClick();
 					}
 					
@@ -328,6 +362,7 @@ public class GestureSensor extends ClickSensor {
 					
 					if(mStartPos == null && mdret.fractionOfScreenInMotion > MIN_FRACTION_SCREEN_MOTION) {
 						mStartPos = mdret.averagePosition;
+						mStartGestureTime = System.currentTimeMillis();
 					}
 					else if(mStartPos != null && mdret.fractionOfScreenInMotion < MIN_FRACTION_SCREEN_MOTION) {
 						// check if it's a vertical move or a horizontal move
@@ -358,15 +393,18 @@ public class GestureSensor extends ClickSensor {
 					
 					// see if we should call a callback based on movementDirection
 					if(mGestureListeners.size() != 0 && movementDirection != Direction.None) {
+						long gestureLength = System.currentTimeMillis() - mStartGestureTime;
+						
 						int adjustedDirection = adjustDirectionForScreenRotation(movementDirection);
+						
 						if(adjustedDirection == Direction.Left.toInt())
-							onGestureLeft();
+							onGestureLeft(gestureLength);
 						else if(adjustedDirection == Direction.Right.toInt())
-							onGestureRight();
+							onGestureRight(gestureLength);
 						else if(adjustedDirection == Direction.Up.toInt())
-							onGestureUp();
+							onGestureUp(gestureLength);
 						else if(adjustedDirection == Direction.Down.toInt())
-							onGestureDown();
+							onGestureDown(gestureLength);
 					}
 					
 					mPreviousPos.x = mdret.averagePosition.x;
@@ -375,6 +413,14 @@ public class GestureSensor extends ClickSensor {
 			}
 		}
 	};
+	
+	/**
+	 * If ClickByColor is enabled, then when the mean color of the pixels is below c, register a click.
+	 * @param c the maximum average color of the pixels received by the camera for a click to be registered
+	 */
+	public void setAverageColorMaxForClick(double c) {
+		mAverageColorMaxForClick = c;
+	}
 	
 	private native MotionDetectionReturnValue DetectMovementPosition(long currentFrame, long previousFrame);
 }

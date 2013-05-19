@@ -13,7 +13,7 @@ import android.util.Log;
  * @author Leeran Raphaely <leeran.raphaely@gmail.com>
  */
 public class MicrophoneClickSensor extends ClickSensor {
-	private static final String TAG = "ClapSensor";
+	private static final String TAG = "MicrophoneClickSensor";
 	
 	private static final int SAMPLE_RATE = 44100;
 	private static final int CHANNEL_CONFIG = AudioFormat.CHANNEL_IN_MONO;
@@ -135,7 +135,7 @@ public class MicrophoneClickSensor extends ClickSensor {
 					totalAbsValue += Math.abs(sample);
 				}
 				averageAbsValue = totalAbsValue / mRawBuffer.length / 2.0;
-				Log.d(TAG, "" + averageAbsValue);
+				// Log.d(TAG, "" + averageAbsValue);
 				
 				if(breakCounter == 0) {
 					// now, let's check if our latest number is far from the norm
