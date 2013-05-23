@@ -17,9 +17,14 @@ import edu.washington.cs.handsfreelibrary.sensors.ClickSensorListener;
 import edu.washington.cs.handsfreelibrary.sensors.GestureSensor;
 
 /**
- * Class <code>GestureCursorController</code> can be used to create the visual and functionality of a
+ * <p>Class <code>GestureCursorController</code> can be used to create the visual and functionality of a
  * cursor that is controlled via gestures. To use this class, one must create a {@link GestureSensor}
- * object and add <code>this</code> to 
+ * object and a {@link ClickSensor} object and set <code>this</code> as a listener to both.</p>
+ * 
+ * <p>For an object of this class to be functional, the view returned by {@link getView} must attached to
+ * a parent object and drawn on the screen somewhere. Clicks will be registered to whatever is below the
+ * view.</p>
+ * 
  * @author Leeran Raphaely <leeran.raphaely@gmail.com>
  *
  */

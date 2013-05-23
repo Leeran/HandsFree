@@ -1,35 +1,22 @@
 package edu.washington.cs.overlaytest;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 
 import edu.washington.cs.handsfreelibrary.sensors.AccelerometerClickSensor;
-import edu.washington.cs.handsfreelibrary.sensors.ClickSensor;
 import edu.washington.cs.handsfreelibrary.sensors.MicrophoneClickSensor;
-import edu.washington.cs.handsfreelibrary.sensors.ClickSensorListener;
 import edu.washington.cs.handsfreelibrary.sensors.GestureSensor;
 import edu.washington.cs.handsfreelibrary.touchemulation.GestureCursorController;
 
-import android.app.Instrumentation;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.graphics.PixelFormat;
-import android.graphics.Point;
 import android.os.Binder;
 import android.os.IBinder;
-import android.os.SystemClock;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 
 public class SystemOverlay extends Service {
