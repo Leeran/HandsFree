@@ -80,6 +80,7 @@ public class ScrollerActivity extends Activity {
 		mGestureSensor.addGestureListener(mGestureScroller);
 		mGestureScroller.setHorizontalScrollEnabled(false);
 		mGestureSensor.enableHorizontalScroll(false);
+		mGestureScroller.setInvertVerticalScroll(true);
 		
 		
 		OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_2_4_3, this, mLoaderCallback);
@@ -91,12 +92,7 @@ public class ScrollerActivity extends Activity {
 		  viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
 			  @Override
 			  public void onGlobalLayout() {
-				  int [] scrollingTextBoxLoc = new int[2];
-				  mScrollingTextBox.getLocationOnScreen(scrollingTextBoxLoc);
-				  int xPos = mScrollingTextBox.getWidth() / 2 + scrollingTextBoxLoc[0];
-
-				  mGestureScroller.setTopPosition(xPos, scrollingTextBoxLoc[1] + 10);
-				  mGestureScroller.setBottomPosition(xPos, scrollingTextBoxLoc[1] + mScrollingTextBox.getHeight() - 10);
+				  mGestureScroller.setVerticalPointsWithView(mScrollingTextBox, 10);
 			  }
 		  });
 		}

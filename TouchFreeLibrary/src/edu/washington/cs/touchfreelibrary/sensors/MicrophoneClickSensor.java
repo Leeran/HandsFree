@@ -5,7 +5,6 @@ import java.util.LinkedList;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
-import android.util.Log;
 
 /**
  * Listen for amplitude spikes coming from the microphone to detect clips. This class is meant to
@@ -13,7 +12,6 @@ import android.util.Log;
  * @author Leeran Raphaely <leeran.raphaely@gmail.com>
  */
 public class MicrophoneClickSensor extends ClickSensor {
-	private static final String TAG = "MicrophoneClickSensor";
 	
 	private static final int SAMPLE_RATE = 44100;
 	private static final int CHANNEL_CONFIG = AudioFormat.CHANNEL_IN_MONO;
@@ -148,7 +146,6 @@ public class MicrophoneClickSensor extends ClickSensor {
 						}
 					} else if(clapCounter >= MAX_LENGTH_OF_CLAP) {
 						// the clap lasted too long. Let's let it be.
-						logSampleAvgs("too long");
 						clapCounter = 0;
 						breakCounter = NUMBER_IN_LIST;
 					} else if(clapCounter > 0) {
@@ -158,7 +155,6 @@ public class MicrophoneClickSensor extends ClickSensor {
 								peakOfClap = averageAbsValue;
 							clapCounter++;
 						} else {
-							logSampleAvgs("out of clap");
 							// we're out of the clap, I believe
 							mSampleAvgValueList.clear();
 							
@@ -169,7 +165,6 @@ public class MicrophoneClickSensor extends ClickSensor {
 							clapCounter++;
 							if(clapCounter == 0) {
 								onSensorClick();
-								logSampleAvgs("on click");
 							}
 						}
 						else clapCounter = 0;
@@ -187,14 +182,6 @@ public class MicrophoneClickSensor extends ClickSensor {
 			}
 		}
 	};
-	
-	private void logSampleAvgs(String msg) {
-		String str = msg + " - Samples: "; 
-		for(Double d : mSampleAvgValueList) {
-			str += d.toString() + ", ";
-		}
-		//Log.d(TAG, str);
-	}
 	
 	/**
 	 * Check whether this is looking at microphone data right now.

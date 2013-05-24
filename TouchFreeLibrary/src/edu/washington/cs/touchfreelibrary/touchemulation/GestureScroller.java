@@ -4,6 +4,7 @@ import android.app.Instrumentation;
 import android.graphics.Point;
 import android.os.SystemClock;
 import android.view.MotionEvent;
+import android.view.View;
 import edu.washington.cs.touchfreelibrary.sensors.GestureSensor;
 
 /**
@@ -25,6 +26,9 @@ public class GestureScroller implements GestureSensor.Listener {
 	private boolean mVerticalScrollEnabled;
 	private boolean mHorizontalScrollEnabled;
 	
+	private boolean mInvertVerticalScroll;
+	private boolean mInvertHorizontalScroll;
+	
 	private Instrumentation mInstrumentation;
 	
 	private boolean mIsRunning;
@@ -44,6 +48,9 @@ public class GestureScroller implements GestureSensor.Listener {
 		
 		mVerticalScrollEnabled = true;
 		mHorizontalScrollEnabled = true;
+		
+		mInvertVerticalScroll = false;
+		mInvertHorizontalScroll = false;
 		
 		mInstrumentation = new Instrumentation();
 		mIsRunning = false;
@@ -106,6 +113,38 @@ public class GestureScroller implements GestureSensor.Listener {
 	}
 	
 	/**
+	 * Set whether this scroller inverts vertical scrolling commands.
+	 * @param inverted true if vertical scrolling should be inverted, false otherwise.
+	 */
+	public void setInvertVerticalScroll(boolean inverted) {
+		mInvertVerticalScroll = inverted;
+	}
+	
+	/**
+	 * Get whether or not this scroller inverts vertical scrolling commands.
+	 * @return true if vertical scrolling is inverted, false otherwise.
+	 */
+	public boolean getInvertVerticalScroll() {
+		return mInvertVerticalScroll;
+	}
+	
+	/**
+	 * Set whether this scroller inverts horizontal scrolling commands.
+	 * @param inverted true if horizontal scrolling should be inverted, false otherwise.
+	 */
+	public void setInvertHorizontalScroll(boolean inverted) {
+		mInvertHorizontalScroll = inverted;
+	}
+	
+	/**
+	 * Get whether or not this scroller inverts vertical scrolling commands.
+	 * @return true if vertical horizontal is inverted, false otherwise.
+	 */
+	public boolean getInvertHorizontalScroll() {
+		return mInvertHorizontalScroll;
+	}
+	
+	/**
 	 * Sets the position, in screen space, of the left point that is used in horizontal scrolling
 	 * @param x the x coordinate, in screen space
 	 * @param y the y coordinate, in screen space
@@ -144,29 +183,77 @@ public class GestureScroller implements GestureSensor.Listener {
 		mBottomPoint.x = x;
 		mBottomPoint.y = y;
 	}
+	
+	/**
+	 * Sets the top and bottom points based on a view. The view must already be placed
+	 * somewhere on the screen for this method to work successfully.
+	 * @param view The view that will be used to set the scrolling points.
+	 * @param margins The number of pixels within the view that the points will be offset by
+	 * vertically.
+	 */
+	public void setVerticalPointsWithView(View view, int margins) {
+		int [] viewScreenCoords = new int[2];
+		view.getLocationOnScreen(viewScreenCoords);
+		int xPos = view.getWidth() / 2 + viewScreenCoords[0];
 
+		setTopPosition(xPos, viewScreenCoords[1] + margins);
+		setBottomPosition(xPos, viewScreenCoords[1] + view.getHeight() - margins);
+	}
+	
+	/**
+	 * Sets the left and right points based on a view. The view must already be placed
+	 * somewhere on the screen for this method to work successfully.
+	 * @param view The view that will be used to set the scrolling points.
+	 * @param margins The number of pixels within the view that the points will be offset by
+	 * horizontally.
+	 */
+	public void setHorizontalPointsWithView(View view, int margins) {
+		int [] viewScreenCoords = new int[2];
+		view.getLocationOnScreen(viewScreenCoords);
+		int yPos = view.getHeight() / 2 + viewScreenCoords[1];
+
+		setLeftPosition(viewScreenCoords[0] + margins, yPos);
+		setRightPosition(viewScreenCoords[0] + view.getWidth() - margins, yPos);
+	}
+	
 	@Override
 	public void onGestureUp(GestureSensor caller, long gestureLength) {
-		if(mVerticalScrollEnabled && mIsRunning && mTopPoint.x >= 0 && mBottomPoint.x >= 0)
-			sendCursorDragEvent(mBottomPoint, mTopPoint, (int)(gestureLength / 6));
+		if(mVerticalScrollEnabled && mIsRunning && mTopPoint.x >= 0 && mBottomPoint.x >= 0) {
+			if(!mInvertVerticalScroll)
+				sendCursorDragEvent(mTopPoint, mBottomPoint, (int)(gestureLength / 6));
+			else
+				sendCursorDragEvent(mBottomPoint, mTopPoint, (int)(gestureLength / 6));
+		}
 	}
 
 	@Override
 	public void onGestureDown(GestureSensor caller, long gestureLength) {
-		if(mVerticalScrollEnabled && mIsRunning && mTopPoint.x >= 0 && mBottomPoint.x >= 0)
-			sendCursorDragEvent(mTopPoint, mBottomPoint, (int)(gestureLength / 6));
+		if(mVerticalScrollEnabled && mIsRunning && mTopPoint.x >= 0 && mBottomPoint.x >= 0) {
+			if(!mInvertVerticalScroll)
+				sendCursorDragEvent(mBottomPoint, mTopPoint, (int)(gestureLength / 6));
+			else
+				sendCursorDragEvent(mTopPoint, mBottomPoint, (int)(gestureLength / 6));
+		}
 	}
 
 	@Override
 	public void onGestureLeft(GestureSensor caller, long gestureLength) {
-		if(mHorizontalScrollEnabled && mIsRunning && mLeftPoint.x >= 0 && mRightPoint.x >= 0)
-			sendCursorDragEvent(mRightPoint, mLeftPoint, (int)(gestureLength / 6));
+		if(mHorizontalScrollEnabled && mIsRunning && mLeftPoint.x >= 0 && mRightPoint.x >= 0) {
+			if(!mInvertHorizontalScroll)
+				sendCursorDragEvent(mLeftPoint, mRightPoint, (int)(gestureLength / 6));
+			else
+				sendCursorDragEvent(mRightPoint, mLeftPoint, (int)(gestureLength / 6));
+		}
 	}
 
 	@Override
 	public void onGestureRight(GestureSensor caller, long gestureLength) {
-		if(mHorizontalScrollEnabled && mIsRunning && mLeftPoint.x >= 0 && mRightPoint.x >= 0)
-			sendCursorDragEvent(mLeftPoint, mRightPoint, (int)(gestureLength / 6));
+		if(mHorizontalScrollEnabled && mIsRunning && mLeftPoint.x >= 0 && mRightPoint.x >= 0) {
+			if(!mInvertHorizontalScroll)
+				sendCursorDragEvent(mRightPoint, mLeftPoint, (int)(gestureLength / 6));
+			else
+				sendCursorDragEvent(mLeftPoint, mRightPoint, (int)(gestureLength / 6));
+		}
 	}
 	
 	// use a simplified case of a cubic Hermite spline to smoothly calculate the position
@@ -207,10 +294,9 @@ public class GestureScroller implements GestureSensor.Listener {
 						
 						event = MotionEvent.obtain(downTime, SystemClock.uptimeMillis(), MotionEvent.ACTION_UP, p.x, p.y, 0);
 						mInstrumentation.sendPointerSync(event);
+						event.recycle();
 					} catch (SecurityException e) {
 						// security exception occurred, but we can pretty much ignore it.
-					} finally {
-						if(event != null) event.recycle();
 					}
 					mCancelMotion = false;
 				}

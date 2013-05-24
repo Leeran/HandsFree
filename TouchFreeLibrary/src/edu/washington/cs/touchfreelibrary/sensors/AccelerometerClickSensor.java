@@ -5,7 +5,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.util.Log;
 
 /**
  * Class <code>AccelerometerClickSensor</code> looks for sudden perturbations in the z-axis of the
@@ -14,7 +13,6 @@ import android.util.Log;
  *
  */
 public class AccelerometerClickSensor extends ClickSensor {
-	private static final String TAG = "AccelerometerClickSensor";
 	
 	private boolean mIsStarted;
 	
@@ -77,8 +75,6 @@ public class AccelerometerClickSensor extends ClickSensor {
 	private SensorEventListener eventListener = new SensorEventListener() {
 		@Override
 		public void onAccuracyChanged(Sensor sensor, int accuracy) {
-			// TODO Auto-generated method stub
-			
 		}
 	
 		@Override
@@ -95,8 +91,6 @@ public class AccelerometerClickSensor extends ClickSensor {
 					mBreakTimer = BREAK_TIME;
 				}
 			} else mBreakTimer--;
-			
-			Log.d(TAG, String.format("Accelerometer: (%f, %f, %f", ax, ay, az));
 		}
 	};
 }
