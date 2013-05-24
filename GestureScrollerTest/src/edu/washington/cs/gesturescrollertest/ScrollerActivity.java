@@ -8,8 +8,8 @@ import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 
-import edu.washington.cs.handsfreelibrary.sensors.GestureSensor;
-import edu.washington.cs.handsfreelibrary.touchemulation.GestureScroller;
+import edu.washington.cs.touchfreelibrary.sensors.GestureSensor;
+import edu.washington.cs.touchfreelibrary.touchemulation.GestureScroller;
 
 import android.os.Bundle;
 import android.app.Activity;

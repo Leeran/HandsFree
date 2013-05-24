@@ -4,10 +4,10 @@ import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 
-import edu.washington.cs.handsfreelibrary.sensors.AccelerometerClickSensor;
-import edu.washington.cs.handsfreelibrary.sensors.MicrophoneClickSensor;
-import edu.washington.cs.handsfreelibrary.sensors.GestureSensor;
-import edu.washington.cs.handsfreelibrary.touchemulation.GestureCursorController;
+import edu.washington.cs.touchfreelibrary.sensors.AccelerometerClickSensor;
+import edu.washington.cs.touchfreelibrary.sensors.MicrophoneClickSensor;
+import edu.washington.cs.touchfreelibrary.sensors.GestureSensor;
+import edu.washington.cs.touchfreelibrary.touchemulation.GestureCursorController;
 
 import android.app.Service;
 import android.content.Intent;
