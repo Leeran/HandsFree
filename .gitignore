@@ -34,7 +34,6 @@ savedIndexNames.txt
 0.png
 
 *.pydevproject
-.project
 .metadata
 bin/**
 tmp/**
@@ -44,7 +43,6 @@ tmp/**/*
 *.swp
 *~.nib
 local.properties
-.classpath
 .settings/
 .loadpath
 
