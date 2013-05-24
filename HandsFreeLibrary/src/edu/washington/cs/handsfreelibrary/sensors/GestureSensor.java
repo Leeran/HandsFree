@@ -152,8 +152,6 @@ public class GestureSensor extends ClickSensor {
 		mCameraId = getFrontCameraId();
 		
 		mContext = context;
-		
-		mFrameProcessor = new Thread(mProcessFramesRunnable);
 	}
 	
 	/**
@@ -255,10 +253,16 @@ public class GestureSensor extends ClickSensor {
 	}
 	
 	/**
-	 * Causes this to start reading camera input and looking for gestures. The camera must be available
-	 * for this method to be successful.
+	 * <p>Causes this to start reading camera input and looking for gestures. The camera must be available
+	 * for this method to be successful.</p>
+	 * <p>Warning! GestureSensor will seize control of the front facing camera, even if the activity loses focus.
+	 * If you would like to let other applications use the camera, you must call stop() when the activity loses
+	 * focus.</p>
 	 */
 	public void start() {
+		if(mIsRunning)
+			return;
+		
 		mPreviousPos = new Point(0, 0);
 		mStartPos = null;
 		
@@ -269,6 +273,15 @@ public class GestureSensor extends ClickSensor {
 		}
 		
 		mCamera = new VideoCapture(mCameraId);
+		
+		if(!mCamera.isOpened()) {
+			// the camera was not available
+			VideoCapture camera = mCamera;
+			mCamera = null; // Make it null before releasing...
+			camera.release();
+			
+			return;
+		}
 
 		List<Size> previewSizes = mCamera.getSupportedPreviewSizes();
 		
@@ -295,6 +308,7 @@ public class GestureSensor extends ClickSensor {
   	    mIsRunning = true;
   	    
   	    // run the frame processor now
+  	    mFrameProcessor = new Thread(mProcessFramesRunnable);
   	    mFrameProcessor.start();
 	}
 	
@@ -302,6 +316,9 @@ public class GestureSensor extends ClickSensor {
 	 * Stops this from looking at camera input for gestures, thus freeing the camera for other uses.
 	 */
 	public void stop() {
+		if(!mIsRunning)
+			return;
+		
 		mIsRunning = false;
 		if (mCamera != null) {
 			synchronized (mProcessFramesRunnable) {
@@ -332,6 +349,36 @@ public class GestureSensor extends ClickSensor {
 		}
 		
 		return dNum % 4;
+	}
+	
+	private boolean isHorScrollAdjustForScreen() {
+		Display display = ((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+		
+		switch(display.getRotation()) {
+		case Surface.ROTATION_0:
+			return mIsVerticalScrollEnabled;
+		case Surface.ROTATION_90:
+			return mIsHorizontalScrollEnabled;
+		case Surface.ROTATION_180:
+			return mIsVerticalScrollEnabled;
+		default:
+			return mIsHorizontalScrollEnabled;
+		}
+	}
+	
+	private boolean isVertScrollAdjustForScreen() {
+		Display display = ((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+		
+		switch(display.getRotation()) {
+		case Surface.ROTATION_0:
+			return mIsHorizontalScrollEnabled;
+		case Surface.ROTATION_90:
+			return mIsVerticalScrollEnabled;
+		case Surface.ROTATION_180:
+			return mIsHorizontalScrollEnabled;
+		default:
+			return mIsVerticalScrollEnabled;
+		}
 	}
 	
 	private Runnable mProcessFramesRunnable = new Runnable() {
@@ -368,7 +415,7 @@ public class GestureSensor extends ClickSensor {
 						// check if it's a vertical move or a horizontal move
 						
 						// for horizontal, assume screen is flipped
-						if(mIsHorizontalScrollEnabled) {
+						if(isHorScrollAdjustForScreen()) {
 							if(mPreviousPos.x - mStartPos.x > mMinDirectionalMotionX) {
 								movementDirection = Direction.Left;
 							}
@@ -376,7 +423,7 @@ public class GestureSensor extends ClickSensor {
 								movementDirection = Direction.Right;
 							}
 						}
-						if(mIsVerticalScrollEnabled) {
+						if(isVertScrollAdjustForScreen()) {
 							double verticalMotion = Math.abs(mPreviousPos.y - mStartPos.y);
 							if(verticalMotion > mMinDirectionalMotionY) {
 								if(movementDirection == Direction.None || verticalMotion * mWidthToHeight > Math.abs(mPreviousPos.x - mStartPos.x) ) {

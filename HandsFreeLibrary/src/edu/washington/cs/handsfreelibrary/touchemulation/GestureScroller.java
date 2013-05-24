@@ -1,7 +1,5 @@
 package edu.washington.cs.handsfreelibrary.touchemulation;
 
-import java.util.Timer;
-
 import android.app.Instrumentation;
 import android.graphics.Point;
 import android.os.SystemClock;
@@ -31,6 +29,8 @@ public class GestureScroller implements GestureSensor.Listener {
 	
 	private boolean mIsRunning;
 	
+	private boolean mCancelMotion;
+	
 	/**
 	 * Creates a new instance of <code>GestureScroller</code>. In order to function, this must be
 	 * set as a listener for a {@link GestureSensor} object. Also, {@link start} must be called to
@@ -47,6 +47,8 @@ public class GestureScroller implements GestureSensor.Listener {
 		
 		mInstrumentation = new Instrumentation();
 		mIsRunning = false;
+		
+		mCancelMotion = false;
 	}
 	
 	/**
@@ -146,25 +148,33 @@ public class GestureScroller implements GestureSensor.Listener {
 	@Override
 	public void onGestureUp(GestureSensor caller, long gestureLength) {
 		if(mVerticalScrollEnabled && mIsRunning && mTopPoint.x >= 0 && mBottomPoint.x >= 0)
-			sendCursorDragEvent(mBottomPoint, mTopPoint, 20);
+			sendCursorDragEvent(mBottomPoint, mTopPoint, (int)(gestureLength / 6));
 	}
 
 	@Override
 	public void onGestureDown(GestureSensor caller, long gestureLength) {
 		if(mVerticalScrollEnabled && mIsRunning && mTopPoint.x >= 0 && mBottomPoint.x >= 0)
-			sendCursorDragEvent(mTopPoint, mBottomPoint, 20);
+			sendCursorDragEvent(mTopPoint, mBottomPoint, (int)(gestureLength / 6));
 	}
 
 	@Override
 	public void onGestureLeft(GestureSensor caller, long gestureLength) {
 		if(mHorizontalScrollEnabled && mIsRunning && mLeftPoint.x >= 0 && mRightPoint.x >= 0)
-			sendCursorDragEvent(mRightPoint, mLeftPoint, 20);
+			sendCursorDragEvent(mRightPoint, mLeftPoint, (int)(gestureLength / 6));
 	}
 
 	@Override
 	public void onGestureRight(GestureSensor caller, long gestureLength) {
 		if(mHorizontalScrollEnabled && mIsRunning && mLeftPoint.x >= 0 && mRightPoint.x >= 0)
-			sendCursorDragEvent(mLeftPoint, mRightPoint, 20);
+			sendCursorDragEvent(mLeftPoint, mRightPoint, (int)(gestureLength / 6));
+	}
+	
+	// use a simplified case of a cubic Hermite spline to smoothly calculate the position
+	private Point calculateSplinePosition(Point p1, Point p2, int time, int steps) {
+		double percentDone = (double)time / (double)steps;
+		
+		double s = 3 * percentDone * percentDone - 2 * percentDone * percentDone * percentDone;
+		return new Point((int)((1 - s) * p1.x + s * p2.x), (int)((1 - s) * p1.y + s * p2.y));
 	}
 
 	// invokes a fake drag using instrumentation. p1 and p2 are in screen space
@@ -173,40 +183,37 @@ public class GestureScroller implements GestureSensor.Listener {
 		new Thread() {
 			@Override
 			public void run() {
-				float x = p1.x;
-				float y = p1.y;
+				Point p = p1;
 				
 				long downTime = SystemClock.uptimeMillis();
 				
-				float xStep = (float)(p2.x - p1.x) / (float)stepCount;
-				float yStep = (float)(p2.y - p1.y) / (float)stepCount;
-				
 				MotionEvent event = null;
 				
-				//synchronized(GestureScroller.this) {
+				synchronized(GestureScroller.this) {
 					try {
-						event = MotionEvent.obtain(downTime, downTime, MotionEvent.ACTION_DOWN, x, y, 0);
+						event = MotionEvent.obtain(downTime, downTime, MotionEvent.ACTION_DOWN, p.x, p.y, 0);
 						mInstrumentation.sendPointerSync(event);
-						mInstrumentation.waitForIdleSync();
+						event.recycle();
 						
 						for (int i = 0; i < stepCount; i++) {
-							x += xStep;
-							y += yStep;
+							p = calculateSplinePosition(p1, p2, i, stepCount);
 							
-							event = MotionEvent.obtain(downTime, SystemClock.uptimeMillis(), MotionEvent.ACTION_MOVE, x, y, 0);
+							event = MotionEvent.obtain(downTime, SystemClock.uptimeMillis(), MotionEvent.ACTION_MOVE, p.x, p.y, 0);
 							mInstrumentation.sendPointerSync(event);
-							mInstrumentation.waitForIdleSync();
+							event.recycle();
+							
+							if(mCancelMotion) break;
 						}
 						
-						event = MotionEvent.obtain(downTime, SystemClock.uptimeMillis(), MotionEvent.ACTION_UP, x, y, 0);
+						event = MotionEvent.obtain(downTime, SystemClock.uptimeMillis(), MotionEvent.ACTION_UP, p.x, p.y, 0);
 						mInstrumentation.sendPointerSync(event);
-						mInstrumentation.waitForIdleSync();
 					} catch (SecurityException e) {
 						// security exception occurred, but we can pretty much ignore it.
 					} finally {
 						if(event != null) event.recycle();
 					}
-				//}
+					mCancelMotion = false;
+				}
 			}
 		}.start();
 	}

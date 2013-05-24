@@ -15,12 +15,16 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.util.Log;
 import android.view.Menu;
+import android.view.ViewTreeObserver;
+import android.view.WindowManager;
 import android.widget.EditText;
 
 public class ScrollerActivity extends Activity {
 	private static final String TAG = "ScrollerActivity";
 	private GestureSensor mGestureSensor;
 	private GestureScroller mGestureScroller;
+	
+	private boolean gestureStarted = false;
 	
 	private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
 	    @Override
@@ -34,6 +38,7 @@ public class ScrollerActivity extends Activity {
 	                
 	                // more initialization steps go here
 	                
+	                gestureStarted = true;
 	                mGestureSensor.start();
 	                mGestureScroller.start();
 	            } break;
@@ -73,16 +78,28 @@ public class ScrollerActivity extends Activity {
 		mGestureSensor = new GestureSensor(ScrollerActivity.this);
 		mGestureScroller = new GestureScroller();
 		mGestureSensor.addGestureListener(mGestureScroller);
-		
-		int [] scrollingTextBoxLoc = new int[2];
-		mScrollingTextBox.getLocationOnScreen(scrollingTextBoxLoc);
-		int xPos = mScrollingTextBox.getWidth() / 2 + scrollingTextBoxLoc[0];
-		
 		mGestureScroller.setHorizontalScrollEnabled(false);
-		mGestureScroller.setTopPosition(xPos, scrollingTextBoxLoc[1] + 10);
-		mGestureScroller.setBottomPosition(xPos, scrollingTextBoxLoc[1] + mScrollingTextBox.getHeight() - 10);
+		mGestureSensor.enableHorizontalScroll(false);
+		
 		
 		OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_2_4_3, this, mLoaderCallback);
+		
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+		
+		ViewTreeObserver viewTreeObserver = mScrollingTextBox.getViewTreeObserver();
+		if (viewTreeObserver.isAlive()) {
+		  viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+			  @Override
+			  public void onGlobalLayout() {
+				  int [] scrollingTextBoxLoc = new int[2];
+				  mScrollingTextBox.getLocationOnScreen(scrollingTextBoxLoc);
+				  int xPos = mScrollingTextBox.getWidth() / 2 + scrollingTextBoxLoc[0];
+
+				  mGestureScroller.setTopPosition(xPos, scrollingTextBoxLoc[1] + 10);
+				  mGestureScroller.setBottomPosition(xPos, scrollingTextBoxLoc[1] + mScrollingTextBox.getHeight() - 10);
+			  }
+		  });
+		}
 	}
 
 	@Override
@@ -91,5 +108,15 @@ public class ScrollerActivity extends Activity {
 		getMenuInflater().inflate(R.menu.scroller, menu);
 		return true;
 	}
-
+	
+	@Override
+	public void onWindowFocusChanged (boolean hasFocus) {
+		if(!gestureStarted)
+			return;
+		
+		if(hasFocus)
+			mGestureSensor.start();
+		else
+			mGestureSensor.stop();
+	}
 }
