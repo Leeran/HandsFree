@@ -8,7 +8,7 @@ import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 
-import edu.washington.cs.touchfreelibrary.sensors.GestureSensor;
+import edu.washington.cs.touchfreelibrary.sensors.CameraGestureSensor;
 import edu.washington.cs.touchfreelibrary.touchemulation.GestureScroller;
 
 import android.os.Bundle;
@@ -21,7 +21,7 @@ import android.widget.EditText;
 
 public class ScrollerActivity extends Activity {
 	private static final String TAG = "ScrollerActivity";
-	private GestureSensor mGestureSensor;
+	private CameraGestureSensor mGestureSensor;
 	private GestureScroller mGestureScroller;
 	
 	private boolean gestureStarted = false;
@@ -34,7 +34,7 @@ public class ScrollerActivity extends Activity {
 	            {
 	                Log.i(TAG, "OpenCV loaded successfully");
 	                
-	                GestureSensor.loadLibrary();
+	                CameraGestureSensor.loadLibrary();
 	                
 	                // more initialization steps go here
 	                
@@ -61,8 +61,6 @@ public class ScrollerActivity extends Activity {
 			    mScrollingTextBox.setText(s.hasNext() ? s.next() : "");
 				othelloInput.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
 		}
 	};
@@ -75,7 +73,7 @@ public class ScrollerActivity extends Activity {
 		mScrollingTextBox = (EditText) findViewById(R.id.scrollingTextBox);
 		mTextLoadThread.start();
 		
-		mGestureSensor = new GestureSensor(ScrollerActivity.this);
+		mGestureSensor = new CameraGestureSensor(ScrollerActivity.this);
 		mGestureScroller = new GestureScroller();
 		mGestureSensor.addGestureListener(mGestureScroller);
 		mGestureScroller.setHorizontalScrollEnabled(false);

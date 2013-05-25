@@ -19,19 +19,19 @@ import android.view.Surface;
 import android.view.WindowManager;
 
 /**
- * <p><code>GestureSensor</code> takes input data from the camera and uses that to sense
+ * <p><code>CameraGestureSensor</code> takes input data from the camera and uses that to sense
  * four gesture commands: up, down, left, and right.</p>
  * 
- * <p><strong>Important: The static function {@link loadLibrary} must be called after
- * OpenCV is initiated and before <code>GestureSensor</code> is instantiated!</strong></p>
+ * <p><strong>Important: The static function {@link #loadLibrary()} must be called after
+ * OpenCV is initiated and before {@link #start()} is called!</strong></p>
  * 
  * @author Leeran Raphaely <leeran.raphaely@gmail.com>
  */
-public class GestureSensor extends ClickSensor {
-	private static final String TAG = "GestureSensor";
+public class CameraGestureSensor extends ClickSensor {
+	private static final String TAG = "CameraGestureSensor";
 	
 	/**
-	 * To receive messages from GestureSensor, classes must implement the <code>GestureSensor.Listener</code>
+	 * To receive messages from CameraGestureSensor, classes must implement the <code>CameraGestureSensor.Listener</code>
 	 * interface.
 	 * 
 	 * @author Leeran Raphaely <leeran.raphaely@gmail.com>
@@ -39,31 +39,31 @@ public class GestureSensor extends ClickSensor {
 	public interface Listener {
 		/**
 		 * Called when an up gesture is triggered
-		 * @param caller the GestureSensor object that made the call
+		 * @param caller the CameraGestureSensor object that made the call
 		 * @param gestureLength the amount of time the gesture took in milliseconds
 		 */
-		public void onGestureUp(GestureSensor caller, long gestureLength);
+		public void onGestureUp(CameraGestureSensor caller, long gestureLength);
 		
 		/**
 		 * Called when a down gesture is triggered
-		 * @param caller the GestureSensor object that made the call
+		 * @param caller the CameraGestureSensor object that made the call
 		 * @param gestureLength the amount of time the gesture took in milliseconds
 		 */
-		public void onGestureDown(GestureSensor caller, long gestureLength);
+		public void onGestureDown(CameraGestureSensor caller, long gestureLength);
 		
 		/**
 		 * Called when a left gesture is triggered
-		 * @param caller the GestureSensor object that made the call
+		 * @param caller the CameraGestureSensor object that made the call
 		 * @param gestureLength the amount of time the gesture took in milliseconds
 		 */
-		public void onGestureLeft(GestureSensor caller, long gestureLength);
+		public void onGestureLeft(CameraGestureSensor caller, long gestureLength);
 		
 		/**
 		 * Called when a right gesture is triggered
-		 * @param caller the GestureSensor object that made the call
+		 * @param caller the CameraGestureSensor object that made the call
 		 * @param gestureLength the amount of time the gesture took in milliseconds
 		 */
-		public void onGestureRight(GestureSensor caller, long gestureLength);
+		public void onGestureRight(CameraGestureSensor caller, long gestureLength);
 	}
 	
 	private enum Direction {
@@ -115,7 +115,7 @@ public class GestureSensor extends ClickSensor {
 	private long mStartGestureTime;
 	
 	/**
-	 * To use a <code>GestureSensor</code> object, this must be called some time after 
+	 * To use a <code>CameraGestureSensor</code> object, this must be called some time after 
 	 * OpenCV is initiated.
 	 */
 	static public void loadLibrary() {
@@ -133,10 +133,10 @@ public class GestureSensor extends ClickSensor {
 	}
 	
 	/**
-	 * Creates a new instance of GestureSensor. Remember to call {@link loadLibrary} 
-	 * @param context A {@link Context} object needed to get the screen rotation.
+	 * Creates a new instance of CameraGestureSensor. Remember to call {@link loadLibrary} 
+	 * @param context A functional Context object needed to get the screen rotation.
 	 */
-	public GestureSensor(Context context) {
+	public CameraGestureSensor(Context context) {
 		mIsHorizontalScrollEnabled = true;
 		mIsVerticalScrollEnabled = true;
 		mIsClickByColorEnabled = false;
@@ -254,7 +254,7 @@ public class GestureSensor extends ClickSensor {
 	/**
 	 * <p>Causes this to start reading camera input and looking for gestures. The camera must be available
 	 * for this method to be successful.</p>
-	 * <p>Warning! GestureSensor will seize control of the front facing camera, even if the activity loses focus.
+	 * <p>Warning! CameraGestureSensor will seize control of the front facing camera, even if the activity loses focus.
 	 * If you would like to let other applications use the camera, you must call stop() when the activity loses
 	 * focus.</p>
 	 */

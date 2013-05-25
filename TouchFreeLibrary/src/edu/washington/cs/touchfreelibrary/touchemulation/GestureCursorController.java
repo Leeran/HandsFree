@@ -3,6 +3,7 @@ package edu.washington.cs.touchfreelibrary.touchemulation;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -13,21 +14,21 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import edu.washington.cs.touchfreelibrary.sensors.ClickSensor;
-import edu.washington.cs.touchfreelibrary.sensors.GestureSensor;
+import edu.washington.cs.touchfreelibrary.sensors.CameraGestureSensor;
 
 /**
  * <p>Class <code>GestureCursorController</code> can be used to create the visual and functionality of a
- * cursor that is controlled via gestures. To use this class, one must create a {@link GestureSensor}
+ * cursor that is controlled via gestures. To use this class, one must create a {@link CameraGestureSensor}
  * object and a {@link ClickSensor} object and set <code>this</code> as a listener to both.</p>
  * 
- * <p>For an object of this class to be functional, the view returned by {@link getView} must attached to
- * a parent object and drawn on the screen somewhere. Clicks will be registered to whatever is below the
- * view.</p>
+ * <p>For an object of this class to be functional, the view returned by {@link #getView()} must attached to
+ * a parent object and drawn on the screen somewhere. You can use {@link #attachToActivity(Activity)} to
+ * easily attach this to an <code>Activity</code>. Clicks will be registered to whatever is below the view.</p>
  * 
  * @author Leeran Raphaely <leeran.raphaely@gmail.com>
  *
  */
-public class GestureCursorController implements GestureSensor.Listener, ClickSensor.Listener {
+public class GestureCursorController implements CameraGestureSensor.Listener, ClickSensor.Listener {
 	protected static final String TAG = "GestureCursorController";
 	
 	private static final int DEFAULT_CURSOR_RADIUS = 20;
@@ -54,7 +55,8 @@ public class GestureCursorController implements GestureSensor.Listener, ClickSen
 		@Override
 		public void run() {
 			synchronized(GestureCursorController.this) {
-				if(mVelocity.x != 0 || mVelocity.y != 0 || mClickCounter != 0) mView.postInvalidate();
+				if(mVelocity.x != 0 || mVelocity.y != 0 || mClickCounter != 0)
+					mView.postInvalidate();
 				
 				if(mSize.x == 0 || mSize.y == 0) {
 					mPosition.x = mPosition.y = 0;
@@ -168,6 +170,41 @@ public class GestureCursorController implements GestureSensor.Listener, ClickSen
 	public View getView() {
 		return mView;
 	}
+	
+	/**
+	 * Set the view stored in GestureCursorController to draw on top of a given <code>Activity</code>
+	 * @param activity the <code>Activity</code> that will get this <code>GestureCursorController</code> attached
+	 * to it.
+	 */
+	public void attachToActivity(Activity activity) {
+		activity.addContentView(mView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+		mView.bringToFront();
+		mView.setVisibility(View.VISIBLE);
+		mView.setWillNotDraw(false);
+	}
+	
+	/**
+	 * Get the position of the cursor in the view's coordinate system.
+	 * @return the position of the cursor in the view's space
+	 */
+	public Point getPositionInViewSpace() {
+		return new Point(mPosition.x, mPosition.y);
+	}
+	
+	/**
+	 * Get the position of the cursor in the screen's coordinate system
+	 * @return the position of the cursor in screen space
+	 */
+	public Point getPositionInScreenSpace() {
+		Point screenPos = new Point(mPosition.x, mPosition.y);
+		int [] screenCoords = new int[2];
+		mView.getLocationOnScreen(screenCoords);
+		
+		screenPos.x += screenCoords[0];
+		screenPos.y += screenCoords[1];
+		
+		return screenPos;
+	}
     
 	private class GestureCursorView extends ViewGroup {
     	public Paint mNormalPaint;
@@ -213,7 +250,7 @@ public class GestureCursorController implements GestureSensor.Listener, ClickSen
     }
 
 	@Override
-	public synchronized void onGestureUp(GestureSensor caller, long gestureLength) {
+	public synchronized void onGestureUp(CameraGestureSensor caller, long gestureLength) {
 		if(mClickCounter == 0) {
 			mVelocity.x = 0;
 			if(mVelocity.y > 0)
@@ -224,7 +261,7 @@ public class GestureCursorController implements GestureSensor.Listener, ClickSen
 	}
 
 	@Override
-	public synchronized void onGestureDown(GestureSensor caller, long gestureLength) {
+	public synchronized void onGestureDown(CameraGestureSensor caller, long gestureLength) {
 		if(mClickCounter == 0) {
 			mVelocity.x = 0;
 			if(mVelocity.y < 0)
@@ -235,7 +272,7 @@ public class GestureCursorController implements GestureSensor.Listener, ClickSen
 	}
 
 	@Override
-	public synchronized void onGestureLeft(GestureSensor caller, long gestureLength) {
+	public synchronized void onGestureLeft(CameraGestureSensor caller, long gestureLength) {
 		if(mClickCounter == 0) {
 			mVelocity.y = 0;
 			if(mVelocity.x > 0)
@@ -246,7 +283,7 @@ public class GestureCursorController implements GestureSensor.Listener, ClickSen
 	}
 
 	@Override
-	public synchronized void onGestureRight(GestureSensor caller, long gestureLength) {
+	public synchronized void onGestureRight(CameraGestureSensor caller, long gestureLength) {
 		if(mClickCounter == 0) {
 			mVelocity.y = 0;
 			if(mVelocity.x < 0)
@@ -260,17 +297,11 @@ public class GestureCursorController implements GestureSensor.Listener, ClickSen
 	public void onSensorClick(ClickSensor caller) {
 		mVelocity.x = mVelocity.y = 0;
 		
-		final Point screenPos = new Point(mPosition.x, mPosition.y);
-		int [] screenCoords = new int[2];
-		mView.getLocationOnScreen(screenCoords);
-		
-		screenPos.x += screenCoords[0];
-		screenPos.y += screenCoords[1];
-		
 		// run the touch event
 		new Thread() {
 			@Override
 			public void run() {
+				Point screenPos = getPositionInScreenSpace();
 				MotionEvent downAction = MotionEvent.obtain(
 						SystemClock.uptimeMillis(), SystemClock.uptimeMillis(),
 						MotionEvent.ACTION_DOWN, screenPos.x, screenPos.y, 0);

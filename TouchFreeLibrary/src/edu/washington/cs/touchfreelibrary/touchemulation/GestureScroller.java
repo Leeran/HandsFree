@@ -5,16 +5,16 @@ import android.graphics.Point;
 import android.os.SystemClock;
 import android.view.MotionEvent;
 import android.view.View;
-import edu.washington.cs.touchfreelibrary.sensors.GestureSensor;
+import edu.washington.cs.touchfreelibrary.sensors.CameraGestureSensor;
 
 /**
  * Class <code>GestureScroller</code> emulates the swipe-to-scroll touch-screen
- * gesture with {@link GestureSensor}'s gestures. Users of this class must set
+ * gesture with {@link CameraGestureSensor}'s gestures. Users of this class must set
  * <code>this</code> as a Listener to an external <code>GestureSensor</code>
  * class.
  * @author Leeran Raphaely <leeran.raphaely@gmail.com>
  */
-public class GestureScroller implements GestureSensor.Listener {
+public class GestureScroller implements CameraGestureSensor.Listener {
 	// Points used for horizontal scroll:
 	private Point mLeftPoint;
 	private Point mRightPoint;
@@ -37,8 +37,8 @@ public class GestureScroller implements GestureSensor.Listener {
 	
 	/**
 	 * Creates a new instance of <code>GestureScroller</code>. In order to function, this must be
-	 * set as a listener for a {@link GestureSensor} object. Also, {@link start} must be called to
-	 * activate this.
+	 * set as a listener to a {@link CameraGestureSensor} object. Also, {@link #start()} must be called to
+	 * activate.
 	 */
 	public GestureScroller() {
 		mLeftPoint = new Point(-1, -1);
@@ -217,7 +217,7 @@ public class GestureScroller implements GestureSensor.Listener {
 	}
 	
 	@Override
-	public void onGestureUp(GestureSensor caller, long gestureLength) {
+	public void onGestureUp(CameraGestureSensor caller, long gestureLength) {
 		if(mVerticalScrollEnabled && mIsRunning && mTopPoint.x >= 0 && mBottomPoint.x >= 0) {
 			if(!mInvertVerticalScroll)
 				sendCursorDragEvent(mTopPoint, mBottomPoint, (int)(gestureLength / 6));
@@ -227,7 +227,7 @@ public class GestureScroller implements GestureSensor.Listener {
 	}
 
 	@Override
-	public void onGestureDown(GestureSensor caller, long gestureLength) {
+	public void onGestureDown(CameraGestureSensor caller, long gestureLength) {
 		if(mVerticalScrollEnabled && mIsRunning && mTopPoint.x >= 0 && mBottomPoint.x >= 0) {
 			if(!mInvertVerticalScroll)
 				sendCursorDragEvent(mBottomPoint, mTopPoint, (int)(gestureLength / 6));
@@ -237,7 +237,7 @@ public class GestureScroller implements GestureSensor.Listener {
 	}
 
 	@Override
-	public void onGestureLeft(GestureSensor caller, long gestureLength) {
+	public void onGestureLeft(CameraGestureSensor caller, long gestureLength) {
 		if(mHorizontalScrollEnabled && mIsRunning && mLeftPoint.x >= 0 && mRightPoint.x >= 0) {
 			if(!mInvertHorizontalScroll)
 				sendCursorDragEvent(mLeftPoint, mRightPoint, (int)(gestureLength / 6));
@@ -247,7 +247,7 @@ public class GestureScroller implements GestureSensor.Listener {
 	}
 
 	@Override
-	public void onGestureRight(GestureSensor caller, long gestureLength) {
+	public void onGestureRight(CameraGestureSensor caller, long gestureLength) {
 		if(mHorizontalScrollEnabled && mIsRunning && mLeftPoint.x >= 0 && mRightPoint.x >= 0) {
 			if(!mInvertHorizontalScroll)
 				sendCursorDragEvent(mRightPoint, mLeftPoint, (int)(gestureLength / 6));

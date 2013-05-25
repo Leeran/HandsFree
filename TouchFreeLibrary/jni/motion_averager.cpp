@@ -17,15 +17,15 @@ extern "C" {
 
     const double EPSILON = 0.00001;
     
-JNIEXPORT jobject JNICALL Java_edu_washington_cs_touchfreelibrary_sensors_GestureSensor_DetectMovementPosition(JNIEnv* env, jobject,
-                                                                                                               jlong currentFrameAddr,
-                                                                                                               jlong previousFrameAddr/*,
-                                                                                                               jlong outputFrameAddr*/);
+JNIEXPORT jobject JNICALL Java_edu_washington_cs_touchfreelibrary_sensors_CameraGestureSensor_DetectMovementPosition(JNIEnv* env, jobject,
+                                                                                                                     jlong currentFrameAddr,
+                                                                                                                     jlong previousFrameAddr/*,
+                                                                                                                     jlong outputFrameAddr*/);
 
-JNIEXPORT jobject JNICALL Java_edu_washington_cs_touchfreelibrary_sensors_GestureSensor_DetectMovementPosition(JNIEnv* env, jobject,
-                                                                                                               jlong currentFrameAddr,
-                                                                                                               jlong previousFrameAddr/*,
-                                                                                                               jlong outputFrameAddr*/)
+JNIEXPORT jobject JNICALL Java_edu_washington_cs_touchfreelibrary_sensors_CameraGestureSensor_DetectMovementPosition(JNIEnv* env, jobject,
+                                                                                                                     jlong currentFrameAddr,
+                                                                                                                     jlong previousFrameAddr/*,
+                                                                                                                     jlong outputFrameAddr*/)
 {
     Mat& currentFrame  = *(Mat*)currentFrameAddr;
     Mat& previousFrame  = *(Mat*)previousFrameAddr;

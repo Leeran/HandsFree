@@ -6,7 +6,7 @@ import org.opencv.android.OpenCVLoader;
 
 import edu.washington.cs.touchfreelibrary.sensors.AccelerometerClickSensor;
 import edu.washington.cs.touchfreelibrary.sensors.MicrophoneClickSensor;
-import edu.washington.cs.touchfreelibrary.sensors.GestureSensor;
+import edu.washington.cs.touchfreelibrary.sensors.CameraGestureSensor;
 import edu.washington.cs.touchfreelibrary.touchemulation.GestureCursorController;
 
 import android.app.Service;
@@ -23,7 +23,7 @@ public class SystemOverlay extends Service {
 	protected static final String TAG = "SystemOverlay";
 	
 	private GestureCursorController mGestureCursorController;
-	private GestureSensor mGestureSensor;
+	private CameraGestureSensor mGestureSensor;
 	private MicrophoneClickSensor mMicrophoneSensor;
 	private AccelerometerClickSensor mAccelerometerSensor;
 	
@@ -45,7 +45,7 @@ public class SystemOverlay extends Service {
 	            {
 	                Log.i(TAG, "OpenCV loaded successfully");
 	                
-	                GestureSensor.loadLibrary();
+	                CameraGestureSensor.loadLibrary();
 	                
 	                // more initialization steps go here.
 	                mGestureSensor.start();
@@ -70,7 +70,7 @@ public class SystemOverlay extends Service {
     public void onCreate() {
         super.onCreate();
         
-        mGestureSensor = new GestureSensor(this);
+        mGestureSensor = new CameraGestureSensor(this);
         mMicrophoneSensor = new MicrophoneClickSensor();
         mAccelerometerSensor = new AccelerometerClickSensor(this);
         
