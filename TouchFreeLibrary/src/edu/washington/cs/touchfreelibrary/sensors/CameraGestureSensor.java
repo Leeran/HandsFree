@@ -406,8 +406,11 @@ public class CameraGestureSensor extends ClickSensor {
 							}
 						}
 						else {
-							if(System.currentTimeMillis() - mClickStartTime >= MILLISECONDS_TO_WAIT_FOR_CLICK)
+							if(System.currentTimeMillis() - mClickStartTime >= MILLISECONDS_TO_WAIT_FOR_CLICK) {
 								mClickStartTime = -1;
+								mCurrentFrame.copyTo(mPreviousFrame);
+								mStartPos = null;
+							}
 							else
 								continue;
 						}
