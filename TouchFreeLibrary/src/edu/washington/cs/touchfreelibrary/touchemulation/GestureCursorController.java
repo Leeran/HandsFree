@@ -50,6 +50,9 @@ public class GestureCursorController implements CameraGestureSensor.Listener, Cl
 	
 	private Instrumentation mInstrumentation;
 	
+	// This click sensor sets the cursors velocity to 0 instead of triggering a click
+	private ClickSensor mStopClickSensor;
+	
 	// create the animation timer
 	private TimerTask mAnimationTimerTask = new TimerTask() {
 		@Override
@@ -112,6 +115,8 @@ public class GestureCursorController implements CameraGestureSensor.Listener, Cl
         mIsRunning = false;
         
         mInstrumentation = new Instrumentation();
+        
+        mStopClickSensor = null;
     }
     
     /**
@@ -205,6 +210,16 @@ public class GestureCursorController implements CameraGestureSensor.Listener, Cl
 		
 		return screenPos;
 	}
+	
+	/**
+	 * Assign one click sensor to set the cursor's velocity to 0 as opposed to actually triggering
+	 * a tap.
+	 * @param stopSensor The click sensor that will cause the cursor to stop. This can be set to
+	 * null if no stop click sensor is wanted.
+	 */
+	public void setStopClickSensor(ClickSensor stopSensor) {
+		mStopClickSensor = stopSensor;
+	}
     
 	private class GestureCursorView extends ViewGroup {
     	public Paint mNormalPaint;
@@ -297,29 +312,32 @@ public class GestureCursorController implements CameraGestureSensor.Listener, Cl
 	public void onSensorClick(ClickSensor caller) {
 		mVelocity.x = mVelocity.y = 0;
 		
-		// run the touch event
-		new Thread() {
-			@Override
-			public void run() {
-				Point screenPos = getPositionInScreenSpace();
-				MotionEvent downAction = MotionEvent.obtain(
-						SystemClock.uptimeMillis(), SystemClock.uptimeMillis(),
-						MotionEvent.ACTION_DOWN, screenPos.x, screenPos.y, 0);
-				MotionEvent upAction = MotionEvent.obtain(
-						SystemClock.uptimeMillis(), SystemClock.uptimeMillis(),
-						MotionEvent.ACTION_UP, screenPos.x, screenPos.y, 0);
-				
-				try {
-					mInstrumentation.sendPointerSync(downAction);
-					mInstrumentation.sendPointerSync(upAction);
-					mClickCounter = NUM_CLICK_FRAMES;
-				} catch (SecurityException e) {
-					// security exception occurred, but we can pretty much ignore it.
-				}
-				
-				downAction.recycle();
-				upAction.recycle();
-			}
-		}.start();
+		if(caller != mStopClickSensor) {
+			new Thread(mInjectTapSequence).start();
+		}
 	}
+	
+	private Runnable mInjectTapSequence = new Runnable() {
+		@Override
+		public void run() {
+			Point screenPos = getPositionInScreenSpace();
+			MotionEvent downAction = MotionEvent.obtain(
+					SystemClock.uptimeMillis(), SystemClock.uptimeMillis(),
+					MotionEvent.ACTION_DOWN, screenPos.x, screenPos.y, 0);
+			MotionEvent upAction = MotionEvent.obtain(
+					SystemClock.uptimeMillis(), SystemClock.uptimeMillis(),
+					MotionEvent.ACTION_UP, screenPos.x, screenPos.y, 0);
+			
+			try {
+				mInstrumentation.sendPointerSync(downAction);
+				mInstrumentation.sendPointerSync(upAction);
+				mClickCounter = NUM_CLICK_FRAMES;
+			} catch (SecurityException e) {
+				// security exception occurred, but we can pretty much ignore it.
+			}
+			
+			downAction.recycle();
+			upAction.recycle();
+		}
+	};
 }

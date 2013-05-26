@@ -81,6 +81,7 @@ public class CameraGestureSensor extends ClickSensor {
 	} ;
 	
 	private final static double DEFAULT_AVERAGE_COLOR_MAX_FOR_CLICK = 30.0;
+	private final static long MILLISECONDS_TO_WAIT_FOR_CLICK = 800;
 	
 	private List<Listener> mGestureListeners;
 	
@@ -111,6 +112,7 @@ public class CameraGestureSensor extends ClickSensor {
 	private Context mContext;
 	
 	private double mAverageColorMaxForClick;
+	private long mClickStartTime;
 	
 	private long mStartGestureTime;
 	
@@ -306,6 +308,8 @@ public class CameraGestureSensor extends ClickSensor {
   	    
   	    mIsRunning = true;
   	    
+  	    mClickStartTime = -1;
+  	    
   	    // run the frame processor now
   	    mFrameProcessor = new Thread(mProcessFramesRunnable);
   	    mFrameProcessor.start();
@@ -392,10 +396,21 @@ public class CameraGestureSensor extends ClickSensor {
 					
 					// see if we need to detect clicks by color, and if so, let's quickly get that out of the way
 					if(mIsClickByColorEnabled) {
-						double avgColor = Core.mean(mCurrentFrame).val[0];
-						
-						if(avgColor < mAverageColorMaxForClick)
-							onSensorClick();
+						if(mClickStartTime == -1) {
+							double avgColor = Core.mean(mCurrentFrame).val[0];
+							
+							if(avgColor < mAverageColorMaxForClick) {
+								onSensorClick();
+								mClickStartTime = System.currentTimeMillis();
+								continue;
+							}
+						}
+						else {
+							if(System.currentTimeMillis() - mClickStartTime >= MILLISECONDS_TO_WAIT_FOR_CLICK)
+								mClickStartTime = -1;
+							else
+								continue;
+						}
 					}
 					
 					// detect the motion
