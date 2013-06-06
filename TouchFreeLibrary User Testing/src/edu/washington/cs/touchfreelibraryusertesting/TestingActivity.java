@@ -32,10 +32,10 @@ public class TestingActivity extends FragmentActivity implements
 	private CameraGestureSensor mGestureSensor;
 	private MicrophoneClickSensor mClickSensor;
 	
-	private boolean mGestureStarted = false;
-	
 	// set when the user leaves the intro page
 	private long mUserId;
+	
+	private boolean mOpenCVInitiated = false;
 	
 	private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
 	    @Override
@@ -45,11 +45,12 @@ public class TestingActivity extends FragmentActivity implements
 	            {
 	                Log.i(TAG, "OpenCV loaded successfully");
 	                
+	                mOpenCVInitiated = true;
+	                
 	                CameraGestureSensor.loadLibrary();
 	                
 	                // more initialization steps go here
 	                
-	                mGestureStarted = true;
 	                mGestureSensor.start();
 	                mClickSensor.start();
 	            } break;
@@ -198,5 +199,54 @@ public class TestingActivity extends FragmentActivity implements
 	
 	public long getUserId() {
 		return mUserId;
+	}
+	
+	@Override
+	public void onWindowFocusChanged (boolean hasFocus) {
+		if(!mOpenCVInitiated)
+			return;
+		
+		if(hasFocus) {
+			mGestureSensor.start();
+			mClickSensor.start();
+		}
+		else {
+			mGestureSensor.stop();
+			mClickSensor.stop();
+		}
+	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		
+		if(!mOpenCVInitiated)
+			return;
+		
+		mGestureSensor.start();
+		mClickSensor.start();
+	}
+	
+	
+	@Override
+	public void onPause() {
+		super.onPause();
+		
+		if(!mOpenCVInitiated)
+			return;
+		
+		mGestureSensor.stop();
+		mClickSensor.stop();
+	}
+	
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		
+		if(!mOpenCVInitiated)
+			return;
+		
+		mGestureSensor.stop();
+		mClickSensor.stop();
 	}
 }
