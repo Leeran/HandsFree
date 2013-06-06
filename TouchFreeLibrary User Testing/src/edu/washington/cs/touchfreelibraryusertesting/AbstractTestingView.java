@@ -32,7 +32,9 @@ public abstract class AbstractTestingView
 	
 	public void stopView() {
 		ViewGroup vg = (ViewGroup)(getParent());
-		vg.removeView(this);
+		if(vg != null) {
+			vg.removeView(this);
+		}
 	}
 	
 	protected Point calculateLinearSplinePosition(Point p1, Point p2, int time, int steps) {

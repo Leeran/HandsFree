@@ -125,7 +125,6 @@ public class TestingActivity extends FragmentActivity implements
 		
 		mCurrentViewID = 0;
 		
-		currentTestingView().startView();
 		mGestureSensor.addGestureListener(currentTestingView());
 		mClickSensor.addClickListener(currentTestingView());
 	}
@@ -220,6 +219,8 @@ public class TestingActivity extends FragmentActivity implements
 	public void onResume() {
 		super.onResume();
 		
+		currentTestingView().startView();
+		
 		if(!mOpenCVInitiated)
 			return;
 		
@@ -231,6 +232,8 @@ public class TestingActivity extends FragmentActivity implements
 	@Override
 	public void onPause() {
 		super.onPause();
+		
+		currentTestingView().stopView();
 		
 		if(!mOpenCVInitiated)
 			return;
