@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">TouchFreeLibrary User Testing</string>
+    <string name="action_settings">Settings</string>
+    <string name="tap_anywhere">Tap anywhere to continue.</string>
+    <string name="clap_continue">Clap to continue.</string>
+    <string name="intro_text">Thank you for agreeing to test out the new TouchFreeLibrary interface.\n\nBefore we begin the tests, let\'s run a brief tutorial to show you how the interface works.</string>
+
+    <string name="gesture_test_intro">
+        It is now time to practice your skills. On the next screen, you will see a
+        series of arrows. Make gestures in the direction of these arrows until you
+        feel substantially comfortable. After that, you will perform an identical
+        activity, only this time your results will be recorded. Feel free to take as
+        long as you need to in the practice round.
+    </string>
+    
+    <string name="click_sensor_intro">
+        Some applications using TouchFreeLibrary will have users click without actually
+        touching the screen. One of the input methods provided is a clap sensor. Try clapping
+        to get to the next screen.
+    </string>
+    
+    <string name="cursor_intro">
+        Another feature programs using TouchFreeLibrary have access to is a cursor that emulates
+        tapping using gestures and some sort of click sensor, in this case, claps. To move the
+        cursor, use your directional gestures. To stop the cursor, go in the opposite direction.\n\n
+        A cursor has been conviently placed on this screen. Feel free to mess around with it until
+        you feel comfortable moving it around.\n\n
+        When you\'re finished, clap to start the next activity.
+    </string>
+    
+    <string name="closer">
+        That\'s all!\n\n
+        Thanks for testing some of the TouchFreeLibrary interfaces. You\'re efforts will not have been in vain.\n\n
+        Sincerely,\n\n
+        Leeran Z. Raphaely
+    </string>
+    
+</resources>

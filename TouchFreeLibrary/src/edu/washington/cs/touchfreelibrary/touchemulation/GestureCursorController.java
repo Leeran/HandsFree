@@ -46,6 +46,8 @@ public class GestureCursorController implements CameraGestureSensor.Listener, Cl
 	
 	private boolean mIsRunning;
 	
+	private boolean mDisableInjection;
+	
 	private int mClickCounter;
 	
 	private Instrumentation mInstrumentation;
@@ -54,7 +56,7 @@ public class GestureCursorController implements CameraGestureSensor.Listener, Cl
 	private ClickSensor mStopClickSensor;
 	
 	// create the animation timer
-	private TimerTask mAnimationTimerTask = new TimerTask() {
+	private class AnimationTimerTask extends TimerTask {
 		@Override
 		public void run() {
 			synchronized(GestureCursorController.this) {
@@ -117,6 +119,8 @@ public class GestureCursorController implements CameraGestureSensor.Listener, Cl
         mInstrumentation = new Instrumentation();
         
         mStopClickSensor = null;
+        
+        mDisableInjection = false;
     }
     
     /**
@@ -127,7 +131,7 @@ public class GestureCursorController implements CameraGestureSensor.Listener, Cl
     	if(!mIsRunning) {
 	    	mIsRunning = true;
 	    	mAnimationTimer = new Timer();
-	        mAnimationTimer.schedule(mAnimationTimerTask, 0, MILLISECONDS_PER_FRAME);
+	        mAnimationTimer.schedule(new AnimationTimerTask(), 0, MILLISECONDS_PER_FRAME);
 	        
 	        mPosition = new Point(mSize.x / 2, mSize.y / 2);
 	        mVelocity = new Point(0, 0);
@@ -170,10 +174,26 @@ public class GestureCursorController implements CameraGestureSensor.Listener, Cl
 	}
 	
 	/**
+	 * Returns the radius of the cursor.
+	 * @return the radius of the cursor
+	 */
+	public int getCursorRadius() {
+		return mCursorRadius;
+	}
+	
+	/**
 	 * @return the view that contains the cursor (clicking won't work unless the view is attached to something)
 	 */
 	public View getView() {
 		return mView;
+	}
+	
+	/**
+	 * Sets whether or not injection will be disabled.
+	 * @param disableInjection if true, injection will not occur. If false, it will occur as per usual.
+	 */
+	public void setDisableInjection(boolean disableInjection) {
+		mDisableInjection = disableInjection;
 	}
 	
 	/**
@@ -189,12 +209,22 @@ public class GestureCursorController implements CameraGestureSensor.Listener, Cl
 	}
 	
 	/**
+	 * Removes the cursor from its parent.
+	 */
+	public void removeFromParent() {
+		ViewGroup vg = (ViewGroup)(getView().getParent());
+		vg.removeView(getView());
+	}
+	
+	/**
 	 * Get the position of the cursor in the view's coordinate system.
 	 * @return the position of the cursor in the view's space
 	 */
 	public Point getPositionInViewSpace() {
 		return new Point(mPosition.x, mPosition.y);
 	}
+	
+	
 	
 	/**
 	 * Get the position of the cursor in the screen's coordinate system
@@ -313,7 +343,10 @@ public class GestureCursorController implements CameraGestureSensor.Listener, Cl
 		mVelocity.x = mVelocity.y = 0;
 		
 		if(caller != mStopClickSensor) {
-			new Thread(mInjectTapSequence).start();
+			if(mDisableInjection)
+				mClickCounter = NUM_CLICK_FRAMES;
+			else
+				new Thread(mInjectTapSequence).start();
 		}
 	}
 	
