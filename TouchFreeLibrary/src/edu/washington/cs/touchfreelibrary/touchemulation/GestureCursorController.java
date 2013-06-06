@@ -52,6 +52,8 @@ public class GestureCursorController implements CameraGestureSensor.Listener, Cl
 	
 	private Instrumentation mInstrumentation;
 	
+	private long mMinimumGestureLength;
+	
 	// This click sensor sets the cursors velocity to 0 instead of triggering a click
 	private ClickSensor mStopClickSensor;
 	
@@ -121,6 +123,8 @@ public class GestureCursorController implements CameraGestureSensor.Listener, Cl
         mStopClickSensor = null;
         
         mDisableInjection = false;
+        
+        mMinimumGestureLength = 0;
     }
     
     /**
@@ -194,6 +198,14 @@ public class GestureCursorController implements CameraGestureSensor.Listener, Cl
 	 */
 	public void setDisableInjection(boolean disableInjection) {
 		mDisableInjection = disableInjection;
+	}
+	
+	/**
+	 * Sets the minimum amount of time, in milliseconds, a gesture has to be to be registered.
+	 * @param clickLength Gestures shorter than clickLength milliseconds will be ignored.
+	 */
+	public void setMinimumGestureLength(long gestureLength) {
+		mMinimumGestureLength = gestureLength;
 	}
 	
 	/**
@@ -296,7 +308,7 @@ public class GestureCursorController implements CameraGestureSensor.Listener, Cl
 
 	@Override
 	public synchronized void onGestureUp(CameraGestureSensor caller, long gestureLength) {
-		if(mClickCounter == 0) {
+		if(mClickCounter == 0 && gestureLength > mMinimumGestureLength) {
 			mVelocity.x = 0;
 			if(mVelocity.y > 0)
 				mVelocity.y = 0;
@@ -307,7 +319,7 @@ public class GestureCursorController implements CameraGestureSensor.Listener, Cl
 
 	@Override
 	public synchronized void onGestureDown(CameraGestureSensor caller, long gestureLength) {
-		if(mClickCounter == 0) {
+		if(mClickCounter == 0 && gestureLength > mMinimumGestureLength) {
 			mVelocity.x = 0;
 			if(mVelocity.y < 0)
 				mVelocity.y = 0;
@@ -318,7 +330,7 @@ public class GestureCursorController implements CameraGestureSensor.Listener, Cl
 
 	@Override
 	public synchronized void onGestureLeft(CameraGestureSensor caller, long gestureLength) {
-		if(mClickCounter == 0) {
+		if(mClickCounter == 0 && gestureLength > mMinimumGestureLength) {
 			mVelocity.y = 0;
 			if(mVelocity.x > 0)
 				mVelocity.x = 0;
@@ -329,7 +341,7 @@ public class GestureCursorController implements CameraGestureSensor.Listener, Cl
 
 	@Override
 	public synchronized void onGestureRight(CameraGestureSensor caller, long gestureLength) {
-		if(mClickCounter == 0) {
+		if(mClickCounter == 0 && gestureLength > mMinimumGestureLength) {
 			mVelocity.y = 0;
 			if(mVelocity.x < 0)
 				mVelocity.x = 0;
